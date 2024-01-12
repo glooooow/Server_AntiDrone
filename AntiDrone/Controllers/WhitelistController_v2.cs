@@ -25,7 +25,6 @@ public class WhitelistController_v2 : Controller
     }
 
     [HttpPost, ActionName("CreateWhitelist")]
-    [Produces("multipart/form-data")]
     [ProducesResponseType(201)]
     public async Task<IActionResult> CreateWhitelist([FromForm] Whitelist? whitelist)
     {
