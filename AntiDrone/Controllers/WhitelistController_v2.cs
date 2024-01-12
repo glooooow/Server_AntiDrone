@@ -25,18 +25,21 @@ public class WhitelistController_v2 : Controller
     }
 
     [HttpPost, ActionName("CreateWhitelist")]
+    [Produces("multipart/form-data")]
     [ProducesResponseType(201)]
-    public async Task<IActionResult> CreateWhitelist([FromBody] Whitelist whitelist)
+    public async Task<IActionResult> CreateWhitelist([FromForm] Whitelist? whitelist)
     {
-        if (_context.Whitelist == null)
+        object? r;
+        if (_context.Whitelist == null || whitelist.affiliation == null) 
         {
-            return Problem("Entity set 'AntiDroneContext.Whitelist'  is null.");
+            r = ResponseGlobal<Whitelist>.Fail(ErrorCode.CanNotWrite);
+            return Json(r);
         }
         _context.Whitelist.Add(whitelist);
         await _context.SaveChangesAsync();
         
-        var response = ResponseGlobal<Whitelist>.Success(whitelist);
-        return Json(response);
+        r = ResponseGlobal<Whitelist>.Success(whitelist);
+        return Json(r);
     }
     
     
