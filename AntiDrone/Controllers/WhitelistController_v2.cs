@@ -4,6 +4,9 @@ using AntiDrone.Models.Systems.DroneControl;
 using AntiDrone.Services.Interfaces;
 using AntiDrone.Utils;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using NuGet.Protocol;
 
 namespace AntiDrone.Controllers;
 
@@ -23,16 +26,30 @@ public class WhitelistController_v2 : Controller
 
     [HttpPost, ActionName("CreateWhitelist")]
     [ProducesResponseType(201)]
-    public async Task<ResponseDTO<Whitelist>> CreateWhitelist([FromBody] Whitelist whitelist)
+    public async Task<IActionResult> CreateWhitelist([FromBody] Whitelist whitelist)
     {
-       
         if (_context.Whitelist == null)
         {
-            return ResponseGlobal<Whitelist>.Fail(ErrorCode.CanNotWrite);
+            return Problem("Entity set 'AntiDroneContext.Whitelist'  is null.");
         }
+        _context.Whitelist.Add(whitelist);
         await _context.SaveChangesAsync();
-        var r = ResponseGlobal<Whitelist>.Success(whitelist);
         
-        return r;
+        var response = ResponseGlobal<Whitelist>.Success(whitelist);
+        return Json(response);
     }
+    
+    
+    //승인 드론 리스트 조회
+     [HttpGet(Name = "GetBoardList")]
+     [ProducesResponseType(200)]
+     public async Task<ActionResult<IEnumerable<Whitelist>>> GetWhiteList()
+     {
+         if (_context.Whitelist == null)
+         {   
+             return null;
+         } 
+         return await _context.Whitelist.ToListAsync();
+     }
+    
 }

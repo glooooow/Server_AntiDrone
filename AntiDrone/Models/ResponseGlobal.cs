@@ -1,16 +1,17 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using AntiDrone.Utils;
 using Humanizer;
+using Newtonsoft.Json;
 
 namespace AntiDrone.Models;
 
 public struct ResponseDTO<T>
 {
-    private bool _success;
-    private bool _fail;
-    private T _data;
-    private string _message;
-    private ErrorCode? _error;
+    public bool _success { get; }
+    public bool _fail { get; }
+    public T _data { get;  }
+    public string _message { get; }
+    public ErrorCode? _error { get;}
 
     public ResponseDTO(bool success, T data, ErrorCode? error)
     {
@@ -18,6 +19,7 @@ public struct ResponseDTO<T>
         this._data = data;
         this._error = error;
     }
+
     public ResponseDTO(bool fail, string message, ErrorCode? error)
     {
         this._fail = fail;
@@ -32,9 +34,9 @@ public abstract class ResponseGlobal<T>
     {
         return new ResponseDTO<T>(true, data, null);
     }
-    
+
     public static ResponseDTO<T> Fail(ErrorCode code)
     {
-        return new ResponseDTO<T>(false,"no data.", code);
+        return new ResponseDTO<T>(false, "no data.", code);
     }
 }
