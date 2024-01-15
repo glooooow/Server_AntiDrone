@@ -1,17 +1,34 @@
-﻿using AntiDrone.Services.Interfaces;
+﻿using System.Net.Mime;
+using AntiDrone.Data;
+using AntiDrone.Models;
+using AntiDrone.Models.Systems.DroneControl;
+using AntiDrone.Services.Interfaces;
+using AntiDrone.Utils;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AntiDrone.Services;
 
 public class WhitelistService : IWhitelistService
 {
-    public string getName()
+    private IWhitelistService _whitelistService;
+    
+    public List<Whitelist> whitelists(List<Whitelist> lists)
     {
-        return "yun";
+        throw new NotImplementedException();
     }
-
-    public string[] changeFirstName(string[] list)
+    
+    public async Task<IActionResult> CreateWhitelist(Whitelist? whitelist, AntiDroneContext context)
     {
-        list[0] = "admin";
-        return list;
+        object? r;
+        if (context.Whitelist == null || whitelist.affiliation == null) 
+        {
+            r = ResponseGlobal<Whitelist>.Fail(ErrorCode.CanNotWrite);
+            return (IActionResult)r;
+        }
+        context.Whitelist.Add(whitelist);
+        await context.SaveChangesAsync();
+        
+        r = ResponseGlobal<Whitelist>.Success(whitelist);
+        return (IActionResult)r;
     }
 }
