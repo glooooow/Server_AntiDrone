@@ -5,6 +5,7 @@ using AntiDrone.Models.Systems.DroneControl;
 using AntiDrone.Services.Interfaces;
 using AntiDrone.Utils;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AntiDrone.Services;
 
@@ -20,7 +21,7 @@ public class WhitelistService : IWhitelistService
     public async Task<IActionResult> CreateWhitelist(Whitelist? whitelist, AntiDroneContext context)
     {
         object? r;
-        if (context.Whitelist == null || whitelist.affiliation == null) 
+        if (context.Whitelist == null || whitelist?.affiliation == null) 
         {
             r = ResponseGlobal<Whitelist>.Fail(ErrorCode.CanNotWrite);
             return (IActionResult)r;
@@ -31,4 +32,10 @@ public class WhitelistService : IWhitelistService
         r = ResponseGlobal<Whitelist>.Success(whitelist);
         return (IActionResult)r;
     }
+
+    public async Task<ActionResult<IEnumerable<Whitelist>>> GetWhitelist(AntiDroneContext context)
+    {
+        return await context.Whitelist.ToListAsync();
+    }
+    
 }

@@ -8,4 +8,5 @@ public interface IWhitelistService
 {
     public List<Whitelist> whitelists(List<Whitelist> lists);
     Task<IActionResult> CreateWhitelist(Whitelist? whitelist, AntiDroneContext context);
+    Task<ActionResult<IEnumerable<Whitelist>>> GetWhitelist(AntiDroneContext context);
 }

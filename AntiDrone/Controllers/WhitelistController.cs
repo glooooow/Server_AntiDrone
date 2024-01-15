@@ -14,7 +14,7 @@ namespace AntiDrone.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-//[Produces("application/json")]
+[Produces(MediaTypeNames.Application.Json)]
 public class WhitelistController : Controller
 {
     private readonly AntiDroneContext _context;
@@ -26,7 +26,7 @@ public class WhitelistController : Controller
         _whitelistService = whitelistService;
     }
 
-    [HttpPost, ActionName("CreateWhitelist"), Produces(MediaTypeNames.Application.Json)]
+    [HttpPost(Name = "CreateWhitelist")]
     [ProducesResponseType(201)]
     public async Task<IActionResult> CreateWhitelist([FromBody] Whitelist? whitelist)
     {
@@ -34,15 +34,11 @@ public class WhitelistController : Controller
     }
     
     //승인 드론 리스트 조회
-     [HttpGet(Name = "GetBoardList")]
+     [HttpGet(Name = "GetWhitelist")]
      [ProducesResponseType(200)]
      public async Task<ActionResult<IEnumerable<Whitelist>>> GetWhiteList()
      {
-         // if (_context.Whitelist == null)
-         // {   
-         //     return null;
-         // } 
-         return await _context.Whitelist.ToListAsync();
+         return await _whitelistService.GetWhitelist(_context);
      }
     
      //     //승인 드론 개별 조회
