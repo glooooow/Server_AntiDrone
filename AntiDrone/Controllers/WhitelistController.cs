@@ -26,11 +26,11 @@ public class WhitelistController : Controller
         _whitelistService = whitelistService;
     }
 
-    [HttpPost(Name = "CreateWhitelist")]
+    [HttpPost(Name = "CreateWhitelist"), Produces(MediaTypeNames.Application.Json)]
     [ProducesResponseType(201)]
     public async Task<IActionResult> CreateWhitelist([FromBody] Whitelist? whitelist)
     {
-        return await _whitelistService.CreateWhitelist(whitelist, _context);
+        return Json(await _whitelistService.CreateWhitelist(whitelist, _context));
     }
     
     //승인 드론 리스트 조회

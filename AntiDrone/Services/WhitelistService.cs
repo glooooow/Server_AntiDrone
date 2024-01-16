@@ -18,19 +18,19 @@ public class WhitelistService : IWhitelistService
         throw new NotImplementedException();
     }
     
-    public async Task<IActionResult> CreateWhitelist(Whitelist? whitelist, AntiDroneContext context)
+    public async Task<object> CreateWhitelist(Whitelist? whitelist, AntiDroneContext context)
     {
         object? r;
         if (context.Whitelist == null || whitelist?.affiliation == null) 
         {
             r = ResponseGlobal<Whitelist>.Fail(ErrorCode.CanNotWrite);
-            return (IActionResult)r;
+            return (ActionResult)r;
         }
         context.Whitelist.Add(whitelist);
         await context.SaveChangesAsync();
         
         r = ResponseGlobal<Whitelist>.Success(whitelist);
-        return (IActionResult)r;
+        return r;
     }
 
     public async Task<ActionResult<IEnumerable<Whitelist>>> GetWhitelist(AntiDroneContext context)
