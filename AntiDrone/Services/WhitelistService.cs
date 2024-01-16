@@ -20,22 +20,23 @@ public class WhitelistService : IWhitelistService
     
     public async Task<object> CreateWhitelist(Whitelist? whitelist, AntiDroneContext context)
     {
-        object? r;
         if (context.Whitelist == null || whitelist?.affiliation == null) 
         {
-            r = ResponseGlobal<Whitelist>.Fail(ErrorCode.CanNotWrite);
-            return (ActionResult)r;
+            return ResponseGlobal<Whitelist>.Fail(ErrorCode.CanNotWrite);
         }
         context.Whitelist.Add(whitelist);
         await context.SaveChangesAsync();
         
-        r = ResponseGlobal<Whitelist>.Success(whitelist);
-        return r;
+        return ResponseGlobal<Whitelist>.Success(whitelist);
     }
 
-    public async Task<ActionResult<IEnumerable<Whitelist>>> GetWhitelist(AntiDroneContext context)
+    public async Task<object> GetWhitelists(AntiDroneContext context)
     {
-        return await context.Whitelist.ToListAsync();
+        if (context.Whitelist == null)
+        {
+            return ResponseGlobal<List<Whitelist>>.Fail(ErrorCode.CanNotWrite);
+        }
+        return ResponseGlobal<List<Whitelist>>.Success(await context.Whitelist.ToListAsync());
     }
     
 }

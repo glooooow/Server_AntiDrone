@@ -36,9 +36,9 @@ public class WhitelistController : Controller
     //승인 드론 리스트 조회
      [HttpGet(Name = "GetWhitelist")]
      [ProducesResponseType(200)]
-     public async Task<ActionResult<IEnumerable<Whitelist>>> GetWhiteList()
+     public async Task<IActionResult> GetWhiteList()
      {
-         return await _whitelistService.GetWhitelist(_context);
+         return Json(await _whitelistService.GetWhitelists(_context));
      }
     
      //     //승인 드론 개별 조회
