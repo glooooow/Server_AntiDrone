@@ -49,4 +49,12 @@ public class WhitelistController : Controller
              return Json(await _whitelistService.GetWhiteDrone(id, _context));
      }
      
+     //승인 드론 개별 삭제
+     [HttpDelete("{id}")]
+     [ProducesResponseType(200)]
+     public async Task<IActionResult> DeleteWhiteDrone(long id)
+     {
+         return Json(await _whitelistService.DeleteWhiteDrone(id, _context));
+     }
+     
 }

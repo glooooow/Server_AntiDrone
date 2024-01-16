@@ -47,4 +47,15 @@ public class WhitelistService : IWhitelistService
         }
         return ResponseGlobal<Whitelist>.Success(await context.Whitelist.FindAsync(id));
     }
+
+    public async Task<object> DeleteWhiteDrone(long id, AntiDroneContext context)
+    {
+        if (await context.Whitelist.FindAsync(id) == null)
+        {
+            return ResponseGlobal<Whitelist>.Fail(ErrorCode.NotFound);
+        }
+        context.Whitelist.Remove(context.Whitelist.Find(id));
+        await context.SaveChangesAsync();
+        return ResponseGlobal<string>.Success("삭제 성공");
+    }
 }
