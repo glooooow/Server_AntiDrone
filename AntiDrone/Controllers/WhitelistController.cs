@@ -40,31 +40,13 @@ public class WhitelistController : Controller
      {
          return Json(await _whitelistService.GetWhitelists(_context));
      }
-    
-     //     //승인 드론 개별 조회
-//     [HttpGet("{id}"), ActionName("GetWhitelistDrone")]
-//     [ProducesResponseType(200)]
-//     public async Task<ActionResult<Whitelist>> GetWhitelistDrone(long id)
-//     {
-//         var whitelist = await _context.Whitelist.FindAsync(id);
-//         if (_context.Whitelist == null || whitelist == null)
-//         {
-//             return NotFound();
-//         }
-//         return whitelist;
-//     }
-//     
-//     //승인 드론 개별 조회
-//     [HttpGet("drone/{id}"), ActionName("GetWhitelistDrone")]
-//     [ProducesResponseType(200)]
-//     public async Task<ResponseDTO<Whitelist>> GetWhiteDrone(long id)
-//     {
-//         var whitelist = await _context.Whitelist.FindAsync(id);
-//         if (_context.Whitelist == null || whitelist == null)
-//         {
-//             return ResponseGlobal<Whitelist>.Fail(ErrorCode.InvalidError);
-//         }
-//         return ResponseGlobal<Whitelist>.Success(whitelist);
-//     }
+     
+     //승인 드론 개별 조회
+     [HttpGet("{id}")]
+     [ProducesResponseType(200)]
+     public async Task<IActionResult> GetWhiteDrone(long id)
+     {
+             return Json(await _whitelistService.GetWhiteDrone(id, _context));
+     }
      
 }

@@ -38,5 +38,13 @@ public class WhitelistService : IWhitelistService
         }
         return ResponseGlobal<List<Whitelist>>.Success(await context.Whitelist.ToListAsync());
     }
-    
+
+    public async Task<object> GetWhiteDrone(long id, AntiDroneContext context)
+    {
+        if (await context.Whitelist.FindAsync(id) == null)
+        {
+            return ResponseGlobal<Whitelist>.Fail(ErrorCode.NotFound);
+        }
+        return ResponseGlobal<Whitelist>.Success(await context.Whitelist.FindAsync(id));
+    }
 }

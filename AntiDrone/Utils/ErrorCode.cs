@@ -5,7 +5,7 @@ public enum ErrorCode
     CanNotWrite,
     InvalidError,
     FeatureNotExist,
-    NotExistBoard,
+    NotFound,
     NoAuthority
 }
 
@@ -13,13 +13,13 @@ public class Error
 {
     public static void ErrorMessage()
     {
-        ErrorCode canNotWrite = ErrorCode.CanNotWrite;
+        ErrorCode CanNotWrite = ErrorCode.CanNotWrite;
         Console.WriteLine("데이터 작성에 실패했습니다.");
 
-        var b = (ErrorCode)1;
-        Console.WriteLine(b);  // output: Summer
+        ErrorCode InvalidError = ErrorCode.InvalidError;
+        Console.WriteLine("알 수 없는 에러.");
 
-        var c = (ErrorCode)4;
-        Console.WriteLine(c);  // output: 4
+        ErrorCode NotFound = ErrorCode.NotFound;
+        Console.WriteLine("요청에 대한 응답을 찾을 수 없습니다.");
     }
 }
