@@ -9,23 +9,20 @@ public enum ErrorCode
     NoAuthority
 }
 
-public class Error
-{
-    public static void ErrorMessage()
-    {
-        ErrorCode CanNotWrite = ErrorCode.CanNotWrite;
-        //"데이터 작성에 실패했습니다."
-
-        ErrorCode InvalidError = ErrorCode.InvalidError;
-        //"알 수 없는 에러."
-
-        ErrorCode FeatureNotExist = ErrorCode.FeatureNotExist;
-        //"현재 지원하지 않는 기능입니다."
-        
-        ErrorCode NotFound = ErrorCode.NotFound;
-        //요청에 대한 응답을 찾을 수 없습니다.
-        
-        ErrorCode NoAuthority = ErrorCode.NoAuthority;
-        //"접근 권한이 없습니다."
+static class ErrorMessage {
+    public static string message(this ErrorCode e) {
+        switch (e) {
+            case ErrorCode.CanNotWrite:
+                return "요청에 대한 응답을 찾을 수 없습니다.";
+            case ErrorCode.InvalidError:
+                return "알 수 없는 에러가 발생하였습니다.";
+            case ErrorCode.FeatureNotExist:
+                return "현재 지원하지 않는 기능입니다.";
+            case ErrorCode.NotFound:
+                return "요청에 대한 응답을 찾을 수 없습니다.";
+            case ErrorCode.NoAuthority:
+                return "접근 권한이 없습니다..";
+        }
+        return String.Empty;
     }
 }

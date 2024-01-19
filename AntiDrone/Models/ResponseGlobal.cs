@@ -22,7 +22,7 @@ public struct ResponseDTO<T>
     {
         this._success = false;
         this._data = default(T);
-        this._error = error;
+        this._error = error.Value;
     }
 }
 
@@ -38,7 +38,7 @@ public abstract class ResponseGlobal<T>
     public static object Fail(ErrorCode code)
     {
         var r = new ResponseDTO<T>(false, null, code);
-        var result = new { Success = r._success, Data = r._data, Error = r._error };
+        var result = new { Success = r._success, Data = r._data, Error = code.message() };
         return result;
     }
 }
