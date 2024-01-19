@@ -21,7 +21,7 @@ static class ErrorMessage {
             case ErrorCode.NotFound:
                 return "요청에 대한 응답을 찾을 수 없습니다.";
             case ErrorCode.NoAuthority:
-                return "접근 권한이 없습니다..";
+                return "접근 권한이 없습니다.";
         }
         return String.Empty;
     }
