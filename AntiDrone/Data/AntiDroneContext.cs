@@ -1,8 +1,9 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using AntiDrone.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using DateOnlyConverter = AntiDrone.Utils.DateOnlyConverter;
+using AntiDrone.Models.Systems.Member;
 
 namespace AntiDrone.Data
 {
@@ -21,5 +22,7 @@ namespace AntiDrone.Data
         }
         
         public DbSet<AntiDrone.Models.Systems.DroneControl.Whitelist> Whitelist { get; set; } = default!;
+        
+        public DbSet<AntiDrone.Models.Systems.Member.Member> Member { get; set; } = default!;
     }
 }
