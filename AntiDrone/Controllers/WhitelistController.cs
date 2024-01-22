@@ -25,8 +25,9 @@ public class WhitelistController : Controller
         _context = context;
         _whitelistService = whitelistService;
     }
-
-    [HttpPost(Name = "CreateWhitelist"), Produces(MediaTypeNames.Application.Json)]
+    
+    //승인 드론 등록
+    [HttpPost(Name = "CreateWhitelist")]
     [ProducesResponseType(201)]
     public async Task<IActionResult> CreateWhitelist([FromBody] Whitelist? whitelist)
     {

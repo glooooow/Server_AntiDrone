@@ -26,6 +26,21 @@ namespace AntiDrone.Controllers
             _member_service = memberService;
         }
 
+        [HttpPost]
+        [ProducesResponseType(201)]
+        public async Task<IActionResult> Register(Member member)
+        {	
+            if (ModelState.IsValid) 
+            {
+                await using (_context)
+                {
+                    _context.Member.Add(member);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            return Json(member);
+        }
+        
         private bool MemberExists(long id)
         {
             return (_context.Member?.Any(e => e.id == id)).GetValueOrDefault();
