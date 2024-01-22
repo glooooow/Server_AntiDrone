@@ -26,7 +26,7 @@ namespace AntiDrone.Controllers
             _member_service = memberService;
         }
 
-        [HttpPost]
+        [HttpPost("Join", Name = "RegisterMember")]
         [ProducesResponseType(201)]
         public async Task<IActionResult> Register(Member member)
         {	
