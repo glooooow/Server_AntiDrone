@@ -32,7 +32,7 @@ namespace AntiDrone.Controllers
         {	
             if (ModelState.IsValid) 
             {
-                await using (_context)
+                using (_context)
                 {
                     _context.Member.Add(member);
                     await _context.SaveChangesAsync();
