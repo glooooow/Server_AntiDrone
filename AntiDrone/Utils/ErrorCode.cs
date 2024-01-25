@@ -6,7 +6,8 @@ public enum ErrorCode
     InvalidError,
     FeatureNotExist,
     NotFound,
-    NoAuthority
+    NoAuthority,
+    NeedToLogin
 }
 
 static class ErrorMessage {
@@ -22,6 +23,8 @@ static class ErrorMessage {
                 return "요청에 대한 응답을 찾을 수 없습니다.";
             case ErrorCode.NoAuthority:
                 return "접근 권한이 없습니다.";
+            case ErrorCode.NeedToLogin:
+                return "로그인이 필요합니다.";
         }
         return String.Empty;
     }

@@ -17,6 +17,17 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IWhitelistService, WhitelistService>();
 builder.Services.AddScoped<IMemberService, MemberService>();
 
+builder.Services.AddDistributedMemoryCache();
+
+// 세션 사용하기 위해 추가
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); /* 지속 시간 */
+    options.Cookie.Name = "AntiDroneSession"; /* 세션명 */
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -29,6 +40,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+// 파이프라인에서 세션 사용, 미들웨어
+app.UseSession();
 
 app.MapControllers();
 
