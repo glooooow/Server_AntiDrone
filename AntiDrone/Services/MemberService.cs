@@ -1,44 +1,58 @@
-﻿using AntiDrone.Data;
+﻿using System.Media;
+using AntiDrone.Data;
 using AntiDrone.Models;
 using AntiDrone.Models.Systems.Member;
 using AntiDrone.Services.Interfaces;
 using AntiDrone.Utils;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Session;
+using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Crypto.Parameters;
 
 namespace AntiDrone.Services;
 
 public class MemberService : IMemberService
 {
     private IMemberService _memberService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    
+    public MemberService(IHttpContextAccessor httpContextAccessor)
+    {
+        _httpContextAccessor = httpContextAccessor;
+    }
     
     public async Task<object> LoginCheck(LoginModel loginModel, AntiDroneContext context)
     {
         string result = loginModel.member_id;
-        HttpContext httpContext = new DefaultHttpContext();
+       //var session = _httpContextAccessor.HttpContext.Session;
         
-        if (loginModel.member_id.Equals(context.Member.FindAsync(loginModel.member_id)) && loginModel.member_pw.Equals(context.Member.Find(loginModel.member_pw)))
+        var checkMember = (context.Member.FirstOrDefault(member => member.member_pw == loginModel.member_pw));
+        if (checkMember != null)
         {
-            if(context.Member.Find().authority == 0)
+            /* 회원 권한 : 0=슈퍼, 1=관리, 2=일반 */
+            switch (checkMember.authority)
             {
-                httpContext.Session.SetString("member_id", loginModel.member_id);
-                httpContext.Session.SetInt32("authority", 0);
+                case 0 :
+                    _httpContextAccessor.HttpContext.Session.SetString("member_id", loginModel.member_id);
+                    _httpContextAccessor.HttpContext.Session.SetInt32("authority", 0);
+                    break;
+                
+                case 1 :
+                    _httpContextAccessor.HttpContext.Session.SetString("member_id", loginModel.member_id);
+                    _httpContextAccessor.HttpContext.Session.SetInt32("authority", 1);
+                    break;
+                
+                case 2 :
+                    _httpContextAccessor.HttpContext.Session.SetString("member_id", loginModel.member_id);
+                    _httpContextAccessor.HttpContext.Session.SetInt32("authority", 0);
+                    break;
             }
-            else if(context.Member.Find().authority == 1)
-            {
-                httpContext.Session.SetString("member_id", loginModel.member_id);
-                httpContext.Session.SetInt32("authority", 1);
-            }
-            else
-            {
-                httpContext.Session.SetString("member_id", loginModel.member_id);
-                httpContext.Session.SetInt32("authority", 2);
-            }
-            return ResponseGlobal<string>.Success(result);
         }
         else
         {
             return ResponseGlobal<string>.Fail(ErrorCode.NeedToLogin);
         }
+        return ResponseGlobal<string>.Success(result);
     }
 
     public async Task<object> GetMemberInfo(long id, AntiDroneContext context)

@@ -3,6 +3,7 @@ using AntiDrone.Models.Systems.DroneControl;
 using AntiDrone.Services;
 using AntiDrone.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IWhitelistService, WhitelistService>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IMemberService, MemberService>();
 
 builder.Services.AddDistributedMemoryCache();

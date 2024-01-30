@@ -29,7 +29,7 @@ namespace AntiDrone.Controllers
         }
         
         // 로그인 회원 확인 및 세션 추가
-        [HttpGet("/LoginCheck", Name = "LoginCheck")]
+        [HttpPost("/LoginCheck", Name = "LoginCheck")]
         [ProducesResponseType(200)]
         public async Task<IActionResult> LoginCheck(LoginModel loginModel)
         {
