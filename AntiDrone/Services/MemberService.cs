@@ -24,7 +24,7 @@ public class MemberService : IMemberService
         _httpContextAccessor = httpContextAccessor;
     }
     
-    public async Task<object> LoginCheck(LoginModel loginModel, AntiDroneContext context)
+    public async Task<object> Login(LoginModel loginModel, AntiDroneContext context)
     {
         string memberId = loginModel.member_id;
         Member.MemberInfo memberInfo = new Member.MemberInfo();
@@ -34,9 +34,10 @@ public class MemberService : IMemberService
         memberInfo.authority = checkMember.authority;
         memberInfo.member_name = checkMember.member_name;
         
-        if (checkMember != null) /* FirstOrDefault 사용시 null 검사를 해줘야한다. */
+        /* 회원정보에 있는 권한 확인 후 세션 추가 */
+        if (checkMember != null) /* >> FirstOrDefault 사용시 null 검사 필요 */
         {
-            /* 회원 권한 : 0=슈퍼, 1=관리, 2=일반 */
+            /* 회원 권한 : 0=관리, 1=운영, 2=일반 */
             switch (checkMember.authority)
             {
                 case 0 :
@@ -60,6 +61,11 @@ public class MemberService : IMemberService
             return ResponseGlobal<Member.MemberInfo>.Fail(ErrorCode.NeedToLogin);
         }
         return ResponseGlobal<Member.MemberInfo>.Success(memberInfo);
+    }
+
+    public Task<object> Logout(AntiDroneContext context)
+    {
+        throw new NotImplementedException();
     }
 
     public async Task<object> GetMemberInfo(long id, AntiDroneContext context)

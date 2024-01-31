@@ -28,12 +28,20 @@ namespace AntiDrone.Controllers
             _memberService = memberService;
         }
         
-        // 로그인 회원 확인 및 세션 추가
-        [HttpPost("/LoginCheck", Name = "LoginCheck")]
+        // 로그인
+        [HttpPost("/Login", Name = "Login")]
         [ProducesResponseType(200)]
-        public async Task<IActionResult> LoginCheck(LoginModel loginModel)
+        public async Task<IActionResult> Login(LoginModel loginModel)
         {
-            return Json(await _memberService.LoginCheck(loginModel, _context));
+            return Json(await _memberService.Login(loginModel, _context));
+        }
+        
+        // 로그아웃
+        [HttpPost("/Logout", Name = "Logout")]
+        [ProducesResponseType(200)]
+        public async Task<IActionResult> Logout()
+        {
+            return Json(await _memberService.Logout(_context));
         }
         
         // 회원 정보 개별 조회

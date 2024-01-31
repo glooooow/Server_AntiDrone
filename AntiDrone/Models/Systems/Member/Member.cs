@@ -6,7 +6,7 @@ public class Member
 {
     [Key]
     public long id { get; set; } /* index */
-    public int authority { get; set; } /* 회원 권한 : 0=슈퍼, 1=관리, 2=일반 */
+    public int authority { get; set; } /* 회원 권한 : 0=관리, 1=운영, 2=일반 */
     public int permission_state { get; set; } /* 가입 승인 상태 : 0=승인대기, 1=승인완료 */
     
     [Required(ErrorMessage ="아이디를 입력하세요.")]
