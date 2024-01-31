@@ -7,7 +7,7 @@ public class Member
     [Key]
     public long id { get; set; } /* index */
     public int authority { get; set; } /* 회원 권한 : 0=슈퍼, 1=관리, 2=일반 */
-    public long permission_state { get; set; } /* 가입 승인 상태 */
+    public int permission_state { get; set; } /* 가입 승인 상태 : 0=승인대기, 1=승인완료 */
     
     [Required(ErrorMessage ="아이디를 입력하세요.")]
     public string member_id { get; set; } /* 회원 아이디 */
@@ -22,6 +22,12 @@ public class Member
     
     public DateTime join_datetime { get; set; } /* 가입 일시 */
     public DateTime latest_access_datetime { get; set; } /* 최근 접속 일시 */
+
+    public class MemberInfo
+    {
+        public int authority { get; set; }
+        public string member_name { get; set; }
+    }
 }
 
 public class LoginModel

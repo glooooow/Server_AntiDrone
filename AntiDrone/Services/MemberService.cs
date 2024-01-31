@@ -1,4 +1,6 @@
-﻿using System.Media;
+﻿using System.Collections;
+using System.Linq.Expressions;
+using System.Media;
 using AntiDrone.Data;
 using AntiDrone.Models;
 using AntiDrone.Models.Systems.Member;
@@ -7,6 +9,7 @@ using AntiDrone.Utils;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Session;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Protocol;
 using Org.BouncyCastle.Crypto.Parameters;
 
 namespace AntiDrone.Services;
@@ -23,11 +26,15 @@ public class MemberService : IMemberService
     
     public async Task<object> LoginCheck(LoginModel loginModel, AntiDroneContext context)
     {
-        string result = loginModel.member_id;
-       //var session = _httpContextAccessor.HttpContext.Session;
+        string memberId = loginModel.member_id;
+        Member.MemberInfo memberInfo = new Member.MemberInfo();
         
+        /* 로그인 정보로 회원 정보 확인 */
         var checkMember = (context.Member.FirstOrDefault(member => member.member_pw == loginModel.member_pw));
-        if (checkMember != null)
+        memberInfo.authority = checkMember.authority;
+        memberInfo.member_name = checkMember.member_name;
+        
+        if (checkMember != null) /* FirstOrDefault 사용시 null 검사를 해줘야한다. */
         {
             /* 회원 권한 : 0=슈퍼, 1=관리, 2=일반 */
             switch (checkMember.authority)
@@ -50,9 +57,9 @@ public class MemberService : IMemberService
         }
         else
         {
-            return ResponseGlobal<string>.Fail(ErrorCode.NeedToLogin);
+            return ResponseGlobal<Member.MemberInfo>.Fail(ErrorCode.NeedToLogin);
         }
-        return ResponseGlobal<string>.Success(result);
+        return ResponseGlobal<Member.MemberInfo>.Success(memberInfo);
     }
 
     public async Task<object> GetMemberInfo(long id, AntiDroneContext context)
