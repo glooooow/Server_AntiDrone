@@ -1,11 +1,16 @@
 ﻿using System.Collections;
 using System.Linq.Expressions;
 using System.Media;
+using System.Net;
 using AntiDrone.Data;
 using AntiDrone.Models;
 using AntiDrone.Models.Systems.Member;
 using AntiDrone.Services.Interfaces;
 using AntiDrone.Utils;
+using Azure;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Session;
 using Microsoft.EntityFrameworkCore;
@@ -63,9 +68,22 @@ public class MemberService : IMemberService
         return ResponseGlobal<Member.MemberInfo>.Success(memberInfo);
     }
 
-    public Task<object> Logout(AntiDroneContext context)
+    public async Task<object> Logout()
     {
-        throw new NotImplementedException();
+        var session = _httpContextAccessor.HttpContext.Session;
+        var cookieReq = _httpContextAccessor.HttpContext.Request.Cookies;
+        var cookieRes = _httpContextAccessor.HttpContext.Response.Cookies;
+        
+        session.Remove("member_id");
+        session.Remove("authority");
+        
+        /* 쿠키가 있으면 제거 */
+        if (cookieReq.ContainsKey("AntiDroneSession"))
+        {
+            cookieRes.Delete("AntiDroneSession");
+        }
+
+        return ResponseGlobal<string>.Success("성공적으로 로그아웃 하였습니다.");
     }
 
     public async Task<object> GetMemberInfo(long id, AntiDroneContext context)
