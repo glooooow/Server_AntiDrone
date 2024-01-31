@@ -1,10 +1,8 @@
-﻿using System.Net.Mime;
-using AntiDrone.Data;
+﻿using AntiDrone.Data;
 using AntiDrone.Models;
 using AntiDrone.Models.Systems.DroneControl;
 using AntiDrone.Services.Interfaces;
 using AntiDrone.Utils;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace AntiDrone.Services;

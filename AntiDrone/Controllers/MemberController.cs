@@ -1,16 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Net.Mime;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using AntiDrone.Data;
 using AntiDrone.Models.Systems.Member;
-using AntiDrone.Services;
 using AntiDrone.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AntiDrone.Controllers
 {

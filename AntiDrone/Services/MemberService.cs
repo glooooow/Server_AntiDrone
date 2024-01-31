@@ -1,21 +1,9 @@
-﻿using System.Collections;
-using System.Linq.Expressions;
-using System.Media;
-using System.Net;
-using AntiDrone.Data;
+﻿using AntiDrone.Data;
 using AntiDrone.Models;
 using AntiDrone.Models.Systems.Member;
 using AntiDrone.Services.Interfaces;
 using AntiDrone.Utils;
-using Azure;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Session;
-using Microsoft.EntityFrameworkCore;
-using NuGet.Protocol;
-using Org.BouncyCastle.Crypto.Parameters;
 
 namespace AntiDrone.Services;
 
