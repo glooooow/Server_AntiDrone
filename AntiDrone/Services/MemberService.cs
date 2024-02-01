@@ -39,10 +39,8 @@ public class MemberService : IMemberService
             /* 회원 권한 : 0=관리, 1=운영, 2=일반 */
             switch (checkMember.authority)
             {
-                case 0 :
-                    _httpContextAccessor.HttpContext.Session.SetString("member_id", loginModel.member_id);
-                    _httpContextAccessor.HttpContext.Session.SetInt32("authority", 0);
-                    break;
+                case 0:
+                    return ResponseGlobal<string>.Success("관리자에게 가입 승인을 요청하세요.");
                 
                 case 1 :
                     _httpContextAccessor.HttpContext.Session.SetString("member_id", loginModel.member_id);
@@ -51,7 +49,12 @@ public class MemberService : IMemberService
                 
                 case 2 :
                     _httpContextAccessor.HttpContext.Session.SetString("member_id", loginModel.member_id);
-                    _httpContextAccessor.HttpContext.Session.SetInt32("authority", 0);
+                    _httpContextAccessor.HttpContext.Session.SetInt32("authority", 2);
+                    break;
+                
+                case 3 :
+                    _httpContextAccessor.HttpContext.Session.SetString("member_id", loginModel.member_id);
+                    _httpContextAccessor.HttpContext.Session.SetInt32("authority", 3);
                     break;
             }
         }
@@ -88,49 +91,39 @@ public class MemberService : IMemberService
         }
         return ResponseGlobal<Member>.Success(await context.Member.FindAsync(id));
     }
-
+    
     public async Task<object> UpdateMemberInfo(long id, UpdateMemberInfo request, AntiDroneContext context)
     {
-        var memberNow = await context.Member.FindAsync(id);
-        var modelState = _actionContextAccessor.ActionContext.ModelState;
+        /* 회원 세션 유무 체크 : 세션의 권한별로 수정할 수 있는 범위의 분류 필요 */
+        var session = _httpContextAccessor.HttpContext.Session;
+        var LoginSession = session.GetInt32("authority");
+        if (LoginSession == null)
+        {
+            return ResponseGlobal<object>.Fail(ErrorCode.NoAuthority);
+        }
         
+        /* 해당 회원 데이터가 있는지 탐색 */
+        var memberNow = await context.Member.FindAsync(id);
         if (memberNow == null)
         {
             return ResponseGlobal<UpdateMemberInfo>.Fail(ErrorCode.NotFound);
         }
         
-        /* 모델의 Required 속성을 일시적으로 무시 */
-       if (modelState.ContainsKey("member_id") && modelState.ContainsKey("member_name"))
+        var modelState = _actionContextAccessor.ActionContext.ModelState; /* 모델의 상태를 호출하여 커스텀하기 위함 */
+       if (modelState.ContainsKey("member_id") && modelState.ContainsKey("member_name")) /* 모델의 Required 속성을 일시적으로 무시 */
         {
             modelState["member_id"].Errors.Clear();
             modelState["member_name"].Errors.Clear();
         }
        
         var properties = request.GetType().GetProperties();
-        // foreach (var property in properties)
-        // {
-        //     if (property.GetValue(request) != null)
-        //     {
-        //         memberNow.GetType().GetProperty(property.Name).SetValue(memberNow, property.GetValue(request));
-        //     }
-        // }
-        var pLen = properties.Length;
-        for (int i=pLen; i==0; i--)
+        foreach (var property in properties)
         {
-            var property = properties[i];
             if (property.GetValue(request) != null)
             {
                 memberNow.GetType().GetProperty(property.Name).SetValue(memberNow, property.GetValue(request));
             }
         }
-        
-        // switch (memberNow.authority) {
-        //     case 2 : 
-        //         memberNow.member_pw = request.member_pw;
-        //         memberNow.member_email = request.member_email;
-        //         memberNow.member_contact = request.member_contact;
-        //         break;
-        // }
         await context.SaveChangesAsync();
         return ResponseGlobal<Member>.Success(memberNow);
     }

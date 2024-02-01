@@ -7,8 +7,9 @@ public class Member
 {
     [Key]
     public long id { get; set; } /* index */
-    public int authority { get; set; } /* 회원 권한 : 0=관리, 1=운영, 2=일반 */
-    public int permission_state { get; set; } /* 가입 승인 상태 : 0=승인대기, 1=승인완료 */
+
+    public int authority { get; set; } = 3; /* 회원 권한 : 0=미할당, 1=관리, 2=운영, 3=일반 */
+    public int permission_state { get; set; } = -1; /* 가입 승인 상태 : -1=승인대기, 1=승인완료 */
     
     [Required(ErrorMessage ="아이디를 입력하세요.")]
     public string member_id { get; set; } /* 회원 아이디 */
