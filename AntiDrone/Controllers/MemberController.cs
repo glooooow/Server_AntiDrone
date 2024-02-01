@@ -43,6 +43,14 @@ namespace AntiDrone.Controllers
         {
             return Json(await _memberService.GetMemberInfo(id, _context));
         }
+        
+        // 회원 정보 수정
+        [HttpPatch("{id}")]
+        [ProducesResponseType(200)]
+        public async Task<IActionResult> UpdateMemberInfo(long id, UpdateMemberInfo request)
+        {
+            return Json(await _memberService.UpdateMemberInfo(id, request, _context));
+        }
      
         // 회원 개별 삭제
         [HttpDelete("{id}")]
