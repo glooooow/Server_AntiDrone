@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Build.Framework;
+using Microsoft.CodeAnalysis;
 
 namespace AntiDrone.Services;
 
@@ -101,7 +102,7 @@ public class MemberService : IMemberService
         {
             return ResponseGlobal<object>.Fail(ErrorCode.NoAuthority);
         }
-        
+
         /* 해당 회원 데이터가 있는지 탐색 */
         var memberNow = await context.Member.FindAsync(id);
         if (memberNow == null)
@@ -116,7 +117,14 @@ public class MemberService : IMemberService
             modelState["member_name"].Errors.Clear();
         }
        
+        if (request.authority == 0) /* 요청 전부터 모델에서 넘어오는 프레임워크 단의 디폴트 처리 값(0 = 미할당)을 기존 DB값으로 유지하기 위함 */
+            request.authority = memberNow.authority;
+        
+        if (request.permission_state == 0) /* 위의 authority와 마찬가지의 방식으로 permission_state 처리 */
+            request.permission_state = memberNow.permission_state;
+        
         var properties = request.GetType().GetProperties();
+
         foreach (var property in properties)
         {
             if (property.GetValue(request) != null)
@@ -152,4 +160,5 @@ public class MemberService : IMemberService
         }
         return ResponseGlobal<Member>.Success(member);
     }
+    
 }
