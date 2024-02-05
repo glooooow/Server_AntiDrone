@@ -13,8 +13,8 @@ public class RadarPredictions
     public double latitude { get; set; } /* 탐지 예측 위도값 */
     public double longitude { get; set; } /* 탐지 예측 경도값 */
     public double altitude { get; set; } /* 탐지 예측 고도값 */
-    public double alititude_sea { get; set; } /* 탐지 예측 해발 고도값 */
-    public double alititude_surface { get; set; } /* 탐지 예측 지표면 고도값 */
+    public double altitude_sea { get; set; } /* 탐지 예측 해발 고도값 */
+    public double altitude_surface { get; set; } /* 탐지 예측 지표면 고도값 */
     public double elevation { get; set; } /* 장비로부터의 탐지 예측 고도값 */
     public double velocity { get; set; } /* 탐지 예측 속도값 */
     public double radial_speed { get; set; } /* 탐지체로 방사한 예측 레이더 속도 */

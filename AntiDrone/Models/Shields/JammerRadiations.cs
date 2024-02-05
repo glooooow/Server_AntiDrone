@@ -8,9 +8,9 @@ public class JammerRadiations
     public long id { get; set; } /* index */
     public string code { get; set; } /* 탐지 데이터 코드 */
     public string agent { get; set; } /* 방사 작업자 */
-    public string body_num { get; set; } /* 재머 본체 식별 번호 : ex) 1번 재머, 2번 재머 */
-    public bool jam_result { get; set; } /* 방사 결과 : true-O, false-X */
-    public bool jam_type { get; set; } /* 방사 종류 : true-자동, false-수동 */
+    public short body_num { get; set; } /* 재머 본체 식별 번호 : ex) 1번 재머, 2번 재머 */
+    public short jam_result { get; set; } /* 방사 결과 : 1 = 성공, 0 = 실패 */
+    public short jam_type { get; set; } /* 방사 종류 : 1 = 자동, 0 = 수동 */
     public string mfr { get; set; } /* 재머 제조사 */
     public double pan { get; set; } /* 재머 방위각(좌우) */
     public double tilt { get; set; } /* 재머 고각(상하) */
