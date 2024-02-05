@@ -13,9 +13,7 @@ public class JammerRadiations
     public bool jam_type { get; set; } /* 방사 종류 : true-자동, false-수동 */
     public string mfr { get; set; } /* 재머 제조사 */
     public double pan { get; set; } /* 재머 방위각(좌우) */
-    public double pan_last { get; set; } /* ???? */
     public double tilt { get; set; } /* 재머 고각(상하) */
-    public double tilt_last { get; set; } /* ???? */
     public double print_400 { get; set; } /* RF 400MHz 출력값 */
     public double print_900 { get; set; } /* RF 900MHz 출력값 */
     public double print_l1 { get; set; } /* RF GNSS L1 출력값 */
