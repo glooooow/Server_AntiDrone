@@ -44,7 +44,7 @@ public class PasswordHasher
         var salt = parts[0];
         var hash = parts[1];
 
-        return Validate(password, salt, hash); /* 검증을 위해 입력값과 분리된 salt, hash 를 파라미터로 받는다. */
+        return Validate(password, salt, hash); /* 검증을 위해 입력값과 분리된 salt, hash 를 파라미터로 받는다. => 로그인 시 복호화 과정 불필요 */
     }
 
     private static string GenerateSalt() /* 암호화시 사용될 키를 생성 */
