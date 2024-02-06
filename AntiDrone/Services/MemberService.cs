@@ -148,6 +148,9 @@ public class MemberService : IMemberService
         ModelStateDictionary modelStateDictionary = new ModelStateDictionary();
         if (modelStateDictionary.IsValid)
         {
+            var encryptPw = PasswordHasher.HashPassword(member.member_pw);
+            member.member_pw = encryptPw;
+            
             using (context)
             {
                 context.Member.Add(member);
