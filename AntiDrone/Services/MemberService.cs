@@ -1,4 +1,5 @@
-﻿using AntiDrone.Data;
+﻿using System.Runtime.InteropServices.JavaScript;
+using AntiDrone.Data;
 using AntiDrone.Models;
 using AntiDrone.Models.Systems.Member;
 using AntiDrone.Services.Interfaces;
@@ -22,18 +23,18 @@ public class MemberService : IMemberService
     
     public async Task<object> Login(LoginModel loginModel, AntiDroneContext context)
     {
-        string memberId = loginModel.member_id;
         Member.MemberBasicInfo memberBasicInfo= new Member.MemberBasicInfo();
         
         /* 로그인 정보로 회원 정보 확인 */
-        var checkMember = (context.Member.FirstOrDefault(member => member.member_pw == loginModel.member_pw));
+        var checkMember = (context.Member.FirstOrDefault(member => member.member_id == loginModel.member_id));
         memberBasicInfo.authority = checkMember.authority;
         memberBasicInfo.member_name = checkMember.member_name;
+        var validateMember = PasswordHasher.VerifyHashedPassword(loginModel.member_pw, checkMember.member_pw);
         
         /* 회원정보에 있는 권한 확인 후 세션 추가 */
-        if (checkMember != null) /* >> FirstOrDefault 사용시 null 검사 필요 */
+        if (checkMember != null &&  validateMember == true) /* >> FirstOrDefault 사용시 null 검사 필요 */
         {
-            /* 회원 권한 : 0=관리, 1=운영, 2=일반 */
+            /* 회원 권한 : 1=관리, 2=운영, 3=일반 */
             switch (checkMember.authority)
             {
                 case 0:
@@ -146,6 +147,13 @@ public class MemberService : IMemberService
     public async Task<object> Register(Member member, AntiDroneContext context)
     {
         ModelStateDictionary modelStateDictionary = new ModelStateDictionary();
+
+        // var validateExisting = (context.Member.FirstOrDefault(member => member.member_id != null));
+        // if (validateExisting == null)
+        // {
+        //     ResponseGlobal<string>.Fail(ErrorCode.NoAuthority);
+        // }
+        
         if (modelStateDictionary.IsValid)
         {
             var encryptPw = PasswordHasher.HashPassword(member.member_pw);
