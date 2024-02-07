@@ -13,9 +13,8 @@ public class Whitelist
     public string drone_model { get; set; } /* 드론 모델명 */
     public string drone_id { get; set; } /* 드론 식별자 */
     public string memo { get; set; } /* 특이사항 메모 */
-    public string approval_state { get; set; } /* 승인 상태 */
+    public string approval_state { get; set; } /* 승인 상태 : 0-미승인, 1-승인, 2-위협 (int값으로 추후 변경) */
     public DateOnly approval_start_date { get; set; } /* 비행 승인 시작 일자 */
     public DateOnly approval_end_date { get; set; } /* 비행 승인 종료 일자 */
     public DateOnly now_date { get; set; } /* 현재 일자 */
-    
 }

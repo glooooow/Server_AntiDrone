@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices.JavaScript;
+﻿using System.Reflection;
+using System.Runtime.InteropServices.JavaScript;
 using AntiDrone.Data;
 using AntiDrone.Models;
 using AntiDrone.Models.Systems.Member;
@@ -27,6 +28,12 @@ public class MemberService : IMemberService
         
         /* 로그인 정보로 회원 정보 확인 */
         var checkMember = (context.Member.FirstOrDefault(member => member.member_id == loginModel.member_id));
+
+        if (checkMember == null)
+        {
+            return ResponseGlobal<object>.Fail(ErrorCode.NoAccount);
+        }
+        
         var validateMember = PasswordHasher.VerifyHashedPassword(loginModel.member_pw, checkMember.member_pw);
         
         /* 응답값 표출을 위한 것으로, DB에 저장된 값을 모델에 담아준다 */
@@ -62,6 +69,8 @@ public class MemberService : IMemberService
         {
             return ResponseGlobal<Member.MemberBasicInfo>.Fail(ErrorCode.NeedToLogin);
         }
+        var mem_index = checkMember.id;
+        LatestLogin(mem_index, context);
         return ResponseGlobal<Member.MemberBasicInfo>.Success(memberBasicInfo);
     }
 
@@ -165,11 +174,40 @@ public class MemberService : IMemberService
             
             using (context)
             {
+                joinDate(member);
                 context.Member.Add(member);
                 await context.SaveChangesAsync();
             }
         }
         return ResponseGlobal<Member>.Success(member);
     }
+
     
+    
+    
+    //------------------------------ void 함수 ------------------------------
+    
+    // 가입 일시 기록
+    public void joinDate(Member member)
+    {
+        DateTime registerTime = DateTime.Now;
+        
+        if (member != null)
+        {
+            member.join_datetime = registerTime;
+        }
+    }
+    
+    // 최근 로그인 일시 기록
+    public void LatestLogin(long id, AntiDroneContext context)
+    {
+        DateTime latestTime = DateTime.Now;
+        
+        var loginMember = context.Member.Find(id);
+        if (loginMember != null)
+        {
+            loginMember.latest_access_datetime = latestTime;
+            context.SaveChangesAsync();
+        }
+    }
 }

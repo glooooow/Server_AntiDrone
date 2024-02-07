@@ -8,7 +8,8 @@ public enum ErrorCode
     NotFound,
     NoAuthority,
     NeedToLogin,
-    ExistedAccount
+    ExistedAccount,
+    NoAccount
 }
 
 static class ErrorMessage {
@@ -28,6 +29,8 @@ static class ErrorMessage {
                 return "로그인이 필요합니다.";
             case ErrorCode.ExistedAccount:
                 return "이미 존재하는 아이디입니다.";
+            case ErrorCode.NoAccount:
+                return "로그인 정보로 가입된 계정이 없습니다.";
         }
         return String.Empty;
     }
