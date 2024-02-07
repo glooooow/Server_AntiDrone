@@ -27,9 +27,11 @@ public class MemberService : IMemberService
         
         /* 로그인 정보로 회원 정보 확인 */
         var checkMember = (context.Member.FirstOrDefault(member => member.member_id == loginModel.member_id));
+        var validateMember = PasswordHasher.VerifyHashedPassword(loginModel.member_pw, checkMember.member_pw);
+        
+        /* 응답값 표출을 위한 것으로, DB에 저장된 값을 모델에 담아준다 */
         memberBasicInfo.authority = checkMember.authority;
         memberBasicInfo.member_name = checkMember.member_name;
-        var validateMember = PasswordHasher.VerifyHashedPassword(loginModel.member_pw, checkMember.member_pw);
         
         /* 회원정보에 있는 권한 확인 후 세션 추가 */
         if (checkMember != null &&  validateMember == true) /* >> FirstOrDefault 사용시 null 검사 필요 */
