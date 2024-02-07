@@ -148,13 +148,15 @@ public class MemberService : IMemberService
     {
         ModelStateDictionary modelStateDictionary = new ModelStateDictionary();
 
-        // var validateExisting = (context.Member.FirstOrDefault(member => member.member_id != null));
-        // if (validateExisting == null)
-        // {
-        //     ResponseGlobal<string>.Fail(ErrorCode.NoAuthority);
-        // }
-        
-        if (modelStateDictionary.IsValid)
+        var signupId = member.member_id;
+        var checkAccount = (context.Member.FirstOrDefault(member => member.member_id == signupId));
+
+        if (checkAccount != null)
+        {
+            return ResponseGlobal<string>.Fail(ErrorCode.ExistedAccount);
+        }
+
+        else if (modelStateDictionary.IsValid)
         {
             var encryptPw = PasswordHasher.HashPassword(member.member_pw);
             member.member_pw = encryptPw;
