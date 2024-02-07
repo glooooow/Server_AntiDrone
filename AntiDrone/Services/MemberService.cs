@@ -149,9 +149,9 @@ public class MemberService : IMemberService
         ModelStateDictionary modelStateDictionary = new ModelStateDictionary();
 
         var signupId = member.member_id;
-        var checkAccount = (context.Member.FirstOrDefault(member => member.member_id == signupId));
+        var checkAccount = (context.Member.FirstOrDefault(member => member.member_id == signupId)); /* 기존 가입된 ID와 똑같은 값 있는지 탐색 */
 
-        if (checkAccount != null)
+        if (checkAccount != null) /* 위에서 탐색한 값이 있으면 에러코드를 반환 */
         {
             return ResponseGlobal<string>.Fail(ErrorCode.ExistedAccount);
         }
