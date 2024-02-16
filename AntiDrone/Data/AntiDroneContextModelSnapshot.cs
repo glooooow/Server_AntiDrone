@@ -35,9 +35,9 @@ namespace AntiDrone.Data
                     b.Property<DateTime>("approval_start_date")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("approval_state")
+                    b.Property<int>("approval_state")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("tinyint");
 
                     b.Property<string>("contact")
                         .IsRequired()
@@ -85,14 +85,6 @@ namespace AntiDrone.Data
 
                     b.Property<DateTime>("latest_access_datetime")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<string>("member_contact")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("member_email")
-                        .IsRequired()
-                        .HasColumnType("longtext");
 
                     b.Property<string>("member_id")
                         .IsRequired()

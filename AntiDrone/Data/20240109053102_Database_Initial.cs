@@ -28,7 +28,7 @@ namespace AntiDrone.Data
                     drone_model = table.Column<string>(type: "longtext", nullable: false),
                     drone_id = table.Column<string>(type: "longtext", nullable: false),
                     memo = table.Column<string>(type: "longtext", nullable: false),
-                    approval_state = table.Column<string>(type: "longtext", nullable: false),
+                    approval_state = table.Column<string>(type: "tinyint", nullable: false),
                     approval_start_date = table.Column<DateOnly>(type: "date", nullable: false),
                     approval_end_date = table.Column<DateOnly>(type: "date", nullable: false),
                     now_date = table.Column<DateOnly>(type: "date", nullable: false)

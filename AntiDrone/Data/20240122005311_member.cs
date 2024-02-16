@@ -47,8 +47,6 @@ namespace AntiDrone.Data
                     member_id = table.Column<string>(type: "longtext", nullable: false),
                     member_pw = table.Column<string>(type: "longtext", nullable: false),
                     member_name = table.Column<string>(type: "longtext", nullable: false),
-                    member_email = table.Column<string>(type: "longtext", nullable: false),
-                    member_contact = table.Column<string>(type: "longtext", nullable: false),
                     join_datetime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     latest_access_datetime = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
