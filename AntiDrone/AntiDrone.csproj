@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <RootNamespace>AntiDrone</RootNamespace>
+        <UserSecretsId>e729530c-3b56-410d-8450-5e73109c57a1</UserSecretsId> <!-- 적용 경로(DB) : C:\Users\{UserName}\AppData\Roaming\Microsoft\UserSecrets\{ID} -->
     </PropertyGroup>
 
     <ItemGroup>
