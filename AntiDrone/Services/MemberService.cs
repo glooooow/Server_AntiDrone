@@ -185,8 +185,23 @@ public class MemberService : IMemberService
     {
         if (name != null)
         {
-            context.Member.Find("member_name").Equals(name);
-            return ResponseGlobal<string>.Success("");
+            var checkMembers = context.Member.Where(member => member.member_name == name);
+            switch (checkMembers.Count())
+            {
+                case 1:
+                    var output = "";
+                    foreach (var member in checkMembers)
+                    {
+                        output = member.member_id;
+                    }
+                    return ResponseGlobal<string>.Success("회원 정보와 일치하는 아이디는 " + output + " 입니다.");
+                
+                case int n when n >= 2:
+                    return ResponseGlobal<string>.Success("중복된 회원 정보가 있습니다.");
+                
+                default: 
+                    return ResponseGlobal<object>.Fail(ErrorCode.NotFound);
+            }
         }
         else
         {
