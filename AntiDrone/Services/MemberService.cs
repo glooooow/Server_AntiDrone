@@ -28,13 +28,12 @@ public class MemberService : IMemberService
         
         /* 로그인 정보로 회원 정보 확인 */
         var checkMember = (context.Member.FirstOrDefault(member => member.member_id == loginModel.member_id));
-
-        if (checkMember == null)
-        {
-            return ResponseGlobal<object>.Fail(ErrorCode.NoAccount);
-        }
-        
         var validateMember = PasswordHasher.VerifyHashedPassword(loginModel.member_pw, checkMember.member_pw);
+
+        if (checkMember == null || validateMember == false)
+        {
+            return ResponseGlobal<object>.Fail(ErrorCode.InvalidAccount);
+        }
         
         /* 응답값 표출을 위한 것으로, DB에 저장된 값을 모델에 담아준다 */
         memberBasicInfo.authority = checkMember.authority;
@@ -182,9 +181,29 @@ public class MemberService : IMemberService
         return ResponseGlobal<Member>.Success(member);
     }
 
-    
-    
-    
+    public async Task<object> ResetPassword(long id, string resetPassword, AntiDroneContext context)
+    {
+        /* 회원 세션 유무 체크 : 세션의 권한별로 수정할 수 있는 범위의 분류 필요 */
+        var session = _httpContextAccessor.HttpContext.Session;
+        var LoginSession = session.GetInt32("authority");
+        if (LoginSession == null || LoginSession == (0) || LoginSession == (2) || LoginSession == (3))
+        {
+            return ResponseGlobal<object>.Fail(ErrorCode.NoAuthority);
+        }
+        
+        if (await context.Member.FindAsync(id) == null)
+        {
+            return ResponseGlobal<Member>.Fail(ErrorCode.NotFound);
+        }
+        
+        var encryptPw = PasswordHasher.HashPassword(resetPassword);
+        context.Member.Find(id).member_pw = encryptPw; /* context.Member.Find(id).member_pw를 변수로 담아 사용하면 값을 복사하여 원래의 객체에 영향을 줄 수 X, 따라서 직접 선언 */
+        
+        await context.SaveChangesAsync();
+        return ResponseGlobal<string>.Success("비밀번호 초기화 완료");
+    }
+
+
     //------------------------------ void 함수 ------------------------------
     
     // 가입 일시 기록

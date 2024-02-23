@@ -2,11 +2,12 @@ using System.Net.Mime;
 using AntiDrone.Data;
 using AntiDrone.Models.Systems.Member;
 using AntiDrone.Services.Interfaces;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AntiDrone.Controllers
 {
-    [Route("[controller]")]
+    [Microsoft.AspNetCore.Mvc.Route("[controller]")]
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
     public class MemberController : Controller
@@ -66,6 +67,14 @@ namespace AntiDrone.Controllers
         public async Task<IActionResult> Register(Member member)
         {	
             return Json(await _memberService.Register(member, _context));
+        }
+        
+        // 비밀번호 초기화 (관리자용 기능)
+        [HttpPost("{id}/resetPw", Name = "ResetPassword")]
+        [ProducesResponseType(200)]
+        public async Task<IActionResult> ResetPassword(long id, string resetPassword)
+        {
+            return Json(await _memberService.ResetPassword(id, resetPassword, _context));
         }
         
         private bool MemberExists(long id)
