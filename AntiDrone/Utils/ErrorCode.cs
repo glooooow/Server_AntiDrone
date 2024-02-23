@@ -2,7 +2,7 @@
 
 public enum ErrorCode
 {
-    CanNotWrite,
+    NotWriteValue,
     UnknownError,
     FeatureNotExist,
     NotFound,
@@ -15,8 +15,8 @@ public enum ErrorCode
 static class ErrorMessage {
     public static string message(this ErrorCode e) {
         switch (e) {
-            case ErrorCode.CanNotWrite:
-                return "요청에 대한 응답을 찾을 수 없습니다.";
+            case ErrorCode.NotWriteValue:
+                return "내용을 입력해주세요.";
             case ErrorCode.UnknownError:
                 return "알 수 없는 에러가 발생하였습니다.";
             case ErrorCode.FeatureNotExist:

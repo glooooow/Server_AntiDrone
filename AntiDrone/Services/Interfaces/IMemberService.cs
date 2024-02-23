@@ -11,5 +11,6 @@ public interface IMemberService
     Task<object> UpdateMemberInfo(long id, UpdateMemberInfo request, AntiDroneContext context);
     Task<object> DeleteMember(long id, AntiDroneContext context);
     Task<object> Register(Member member, AntiDroneContext context);
+    Task<object> FindAccount(string name, AntiDroneContext context);
     Task<object> ResetPassword(long id, string resetPassword, AntiDroneContext context);
 }

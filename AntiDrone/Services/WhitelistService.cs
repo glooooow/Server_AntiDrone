@@ -20,7 +20,7 @@ public class WhitelistService : IWhitelistService
     {
         if (context.Whitelist == null || whitelist?.affiliation == null) 
         {
-            return ResponseGlobal<Whitelist>.Fail(ErrorCode.CanNotWrite);
+            return ResponseGlobal<Whitelist>.Fail(ErrorCode.NotWriteValue);
         }
         context.Whitelist.Add(whitelist);
         await context.SaveChangesAsync();
@@ -32,7 +32,7 @@ public class WhitelistService : IWhitelistService
     {
         if (context.Whitelist == null)
         {
-            return ResponseGlobal<List<Whitelist>>.Fail(ErrorCode.CanNotWrite);
+            return ResponseGlobal<List<Whitelist>>.Fail(ErrorCode.NotWriteValue);
         }
         return ResponseGlobal<List<Whitelist>>.Success(await context.Whitelist.ToListAsync());
     }

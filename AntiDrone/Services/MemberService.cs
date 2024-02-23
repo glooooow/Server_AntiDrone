@@ -181,9 +181,22 @@ public class MemberService : IMemberService
         return ResponseGlobal<Member>.Success(member);
     }
 
+    public async Task<object> FindAccount(string name, AntiDroneContext context)
+    {
+        if (name != null)
+        {
+            context.Member.Find("member_name").Equals(name);
+            return ResponseGlobal<string>.Success("");
+        }
+        else
+        {
+            return ResponseGlobal<object>.Fail(ErrorCode.NotWriteValue);
+        }
+    }
+
     public async Task<object> ResetPassword(long id, string resetPassword, AntiDroneContext context)
     {
-        /* 회원 세션 유무 체크 : 세션의 권한별로 수정할 수 있는 범위의 분류 필요 */
+        /* 회원 세션 체크 : 관리자 권한이 있는지 확인 */
         var session = _httpContextAccessor.HttpContext.Session;
         var LoginSession = session.GetInt32("authority");
         if (LoginSession == null || LoginSession == (0) || LoginSession == (2) || LoginSession == (3))

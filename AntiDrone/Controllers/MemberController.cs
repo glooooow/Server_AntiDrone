@@ -69,6 +69,14 @@ namespace AntiDrone.Controllers
             return Json(await _memberService.Register(member, _context));
         }
         
+        // 아이디 찾기
+        [HttpGet("/FindAccount", Name = "FindMemberId")]
+        [ProducesResponseType(200)]
+        public async Task<IActionResult> FindAccount(string name)
+        {
+            return Json(await _memberService.FindAccount(name, _context));
+        }
+        
         // 비밀번호 초기화 (관리자용 기능)
         [HttpPost("{id}/resetPw", Name = "ResetPassword")]
         [ProducesResponseType(200)]
