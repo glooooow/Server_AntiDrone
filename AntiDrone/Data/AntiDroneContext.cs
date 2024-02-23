@@ -22,7 +22,7 @@ namespace AntiDrone.Data
         }
         
         public DbSet<AntiDrone.Models.Systems.DroneControl.Whitelist> Whitelist { get; set; } = default!;
-        
         public DbSet<AntiDrone.Models.Systems.Member.Member> Member { get; set; } = default!;
+        public DbSet<AntiDrone.Models.Systems.Member.MemberLog> MemberLog { get; set; } = default!;
     }
 }
