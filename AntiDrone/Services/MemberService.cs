@@ -194,7 +194,7 @@ public class MemberService : IMemberService
                     {
                         member_id = member.member_id;
                     }
-                    return ResponseGlobal<string>.Success("회원 정보와 일치하는 아이디는 " + member_id + " 입니다.");
+                    return ResponseGlobal<string>.Success("입력하신 회원 정보와 일치하는 아이디는 " + member_id + " 입니다.");
                 
                 case int n when n >= 2: /* 검색한 이름에 따른 아이디 값이 2개 이상일 때 */
                     string[] member_ids = checkMembers.Select(member => member.member_id).ToArray(); /* 아이디 값들을 배열로 리턴하기 위함 */
