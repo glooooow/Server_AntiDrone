@@ -189,6 +189,7 @@ public class MemberService : IMemberService
                 await context.SaveChangesAsync();
             }
         }
+        member.member_pw = "비밀번호"; /* 응답 값에 비밀번호 숨김 위함 */
         return ResponseGlobal<Member>.Success(member);
     }
 
