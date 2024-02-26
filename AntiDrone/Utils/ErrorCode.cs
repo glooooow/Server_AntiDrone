@@ -9,7 +9,9 @@ public enum ErrorCode
     NoAuthority,
     NeedToLogin,
     ExistedAccount,
-    InvalidAccount
+    InvalidAccount,
+    NotAllowedId,
+    NotAllowedName
 }
 
 static class ErrorMessage {
@@ -31,6 +33,10 @@ static class ErrorMessage {
                 return "이미 존재하는 아이디입니다.";
             case ErrorCode.InvalidAccount:
                 return "로그인 정보가 일치하지 않습니다.";
+            case ErrorCode.NotAllowedId:
+                return "아이디는 영문(소문자) 또는 영문을 포함한 숫자로 입력해주세요.(최대 20자)";
+            case ErrorCode.NotAllowedName:
+                return "한글 이름을 올바르게 입력해주세요.(최대 7자)";
         }
         return String.Empty;
     }

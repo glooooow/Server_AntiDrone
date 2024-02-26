@@ -19,7 +19,9 @@ namespace AntiDrone.Controllers
             _memberLogService = memberLogService;
         }
         
-
+        
+        
+        
         private bool MemberLogExists(long id)
         {
             return (_context.MemberLog?.Any(e => e.id == id)).GetValueOrDefault();

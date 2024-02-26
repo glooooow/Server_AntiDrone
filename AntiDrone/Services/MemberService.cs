@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices.JavaScript;
+using System.Text.RegularExpressions;
 using AntiDrone.Data;
 using AntiDrone.Models;
 using AntiDrone.Models.Systems.Member;
@@ -157,10 +158,20 @@ public class MemberService : IMemberService
     public async Task<object> Register(Member member, AntiDroneContext context)
     {
         ModelStateDictionary modelStateDictionary = new ModelStateDictionary();
-
+        
         var signupId = member.member_id;
-        var checkAccount = (context.Member.FirstOrDefault(member => member.member_id == signupId)); /* 기존 가입된 ID와 똑같은 값 있는지 탐색 */
+        if (IdValidCheck(signupId) == false)
+        {
+            return ResponseGlobal<object>.Fail(ErrorCode.NotAllowedId);
+        }
 
+        var name = member.member_name;
+        if (NameValidCheck(name) == false)
+        {
+            return ResponseGlobal<object>.Fail(ErrorCode.NotAllowedName);
+        }
+        
+        var checkAccount = (context.Member.FirstOrDefault(member => member.member_id == signupId)); /* 기존 가입된 ID와 똑같은 값 있는지 탐색 */
         if (checkAccount != null) /* 위에서 탐색한 값이 있으면 에러코드를 반환 */
         {
             return ResponseGlobal<string>.Fail(ErrorCode.ExistedAccount);
@@ -173,7 +184,7 @@ public class MemberService : IMemberService
             
             using (context)
             {
-                joinDate(member);
+                JoinDate(member);
                 context.Member.Add(member);
                 await context.SaveChangesAsync();
             }
@@ -236,7 +247,7 @@ public class MemberService : IMemberService
     //------------------------------ void 함수 ------------------------------
     
     // 가입 일시 기록
-    public void joinDate(Member member)
+    public void JoinDate(Member member)
     {
         DateTime registerTime = DateTime.Now;
         
@@ -244,6 +255,18 @@ public class MemberService : IMemberService
         {
             member.join_datetime = registerTime;
         }
+    }
+    
+    // 아이디 정규식
+    public bool IdValidCheck(string input)
+    {
+        return Regex.IsMatch(input, @"^[0-9a-z]{1,20}$");
+    }
+    
+    // 이름 정규식
+    public bool NameValidCheck(string input)
+    {
+        return Regex.IsMatch(input, @"^[가-힣]{2,7}$");
     }
     
     // 최근 로그인 일시 기록
