@@ -328,6 +328,11 @@ public class MemberService : IMemberService
                 memberLog.memlog_from = session.GetString("member_id");
                 memberLog.memlog_to = context.Member.Find(id).member_id;
                 break;
+            case "권한 변경" :
+                memberLog.memlog_type = "권한 변경";
+                memberLog.memlog_from = session.GetString("member_id");
+                memberLog.memlog_to = context.Member.Find(id).member_id;
+                break;
         }
         context.MemberLog.Add(memberLog);
     }
