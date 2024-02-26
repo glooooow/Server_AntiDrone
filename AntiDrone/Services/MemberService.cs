@@ -244,7 +244,7 @@ public class MemberService : IMemberService
     }
 
 
-    //------------------------------ void 함수 ------------------------------
+    //------------------------------ void 및 클래스 내 util 함수 ------------------------------
     
     // 가입 일시 기록
     public void JoinDate(Member member)
