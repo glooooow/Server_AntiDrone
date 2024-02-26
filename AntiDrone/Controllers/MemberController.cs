@@ -2,12 +2,11 @@ using System.Net.Mime;
 using AntiDrone.Data;
 using AntiDrone.Models.Systems.Member;
 using AntiDrone.Services.Interfaces;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AntiDrone.Controllers
 {
-    [Microsoft.AspNetCore.Mvc.Route("[controller]")]
+    [Route("[controller]")]
     [ApiController]
     [Produces(MediaTypeNames.Application.Json)]
     public class MemberController : Controller
