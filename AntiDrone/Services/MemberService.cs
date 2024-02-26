@@ -71,6 +71,7 @@ public class MemberService : IMemberService
         }
         var mem_index = checkMember.id;
         LatestLogin(mem_index, context);
+        RecordMemberLog(mem_index, "로그인", context);
         await context.SaveChangesAsync();
         
         return ResponseGlobal<Member.MemberBasicInfo>.Success(memberBasicInfo);
@@ -82,7 +83,7 @@ public class MemberService : IMemberService
         var cookieReq = _httpContextAccessor.HttpContext.Request.Cookies;
         var cookieRes = _httpContextAccessor.HttpContext.Response.Cookies;
         
-        RecordLogout(context);
+        RecordMemberLog(0, "로그아웃", context);
         session.Remove("member_id");
         session.Remove("authority");
         
@@ -188,12 +189,14 @@ public class MemberService : IMemberService
             
             using (context)
             {
-                JoinDate(member);
                 context.Member.Add(member);
+                JoinDate(member, context);
+                context.SaveChanges();
+                RecordMemberLog(member.id, "회원가입", context);
                 await context.SaveChangesAsync();
             }
         }
-        member.member_pw = "비밀번호"; /* 응답 값에 비밀번호 숨김 위함 */
+        member.member_pw = "비밀번호"; /* 응답 값에 비밀번호 숨김 위함, DB에 영향 없음 */
         return ResponseGlobal<Member>.Success(member);
     }
 
@@ -244,6 +247,7 @@ public class MemberService : IMemberService
         var encryptPw = PasswordHasher.HashPassword(resetPassword);
         context.Member.Find(id).member_pw = encryptPw; /* context.Member.Find(id).member_pw를 변수로 담아 사용하면 값을 복사하여 원래의 객체에 영향을 줄 수 X, 따라서 직접 선언 */
         
+        RecordMemberLog(id, "비밀번호 초기화", context);
         await context.SaveChangesAsync();
         return ResponseGlobal<string>.Success("비밀번호 초기화 완료");
     }
@@ -251,8 +255,8 @@ public class MemberService : IMemberService
 
     //------------------------------ void 및 클래스 내 util 함수 ------------------------------
     
-    // 가입 일시 기록
-    public void JoinDate(Member member)
+    // 가입 일시 기록 및 이력 저장
+    public void JoinDate(Member member, AntiDroneContext context)
     {
         DateTime registerTime = DateTime.Now;
         
@@ -283,35 +287,48 @@ public class MemberService : IMemberService
         if (loginMember != null)
         {
             loginMember.latest_access_datetime = latestTime;
-            
-            /* 로그인 이력 저장 */
-            MemberLog memberLog = new MemberLog();
-            
-            memberLog.memlog_type = "로그인";
-            memberLog.memlog_level = "INFO";
-            memberLog.memlog_from = context.Member.Find(id).member_id;
-            memberLog.memlog_to = context.Member.Find(id).member_id;
-            memberLog.memlog_datetime = loginMember.latest_access_datetime;
-        
-            context.MemberLog.Add(memberLog);
         }
     }
     
-    // 로그아웃 이력 저장
-    public void RecordLogout(AntiDroneContext context)
+    // 사용자 이력 저장
+    public void RecordMemberLog(long id, string type, AntiDroneContext context)
     {
+        MemberLog memberLog = new MemberLog();
+        DateTime logOccurTime = DateTime.Now;
+        
         var session = _httpContextAccessor.HttpContext.Session;
         
-        MemberLog memberLog = new MemberLog();
-        DateTime logoutDateTime = DateTime.Now;
-        
-        memberLog.memlog_type = "로그아웃";
         memberLog.memlog_level = "INFO";
-        memberLog.memlog_from = session.GetString("member_id");
-        memberLog.memlog_to = session.GetString("member_id");
-        memberLog.memlog_datetime = logoutDateTime;
-
+        memberLog.memlog_datetime = logOccurTime;
+        
+        switch (type)
+        {
+            case "회원가입" :
+                memberLog.memlog_type = "회원가입";
+                memberLog.memlog_from = context.Member.Find(id).member_id;
+                memberLog.memlog_to = context.Member.Find(id).member_id;
+                break;
+            case "가입 승인" :
+                memberLog.memlog_type = "가입 승인";
+                memberLog.memlog_from = session.GetString("member_id");
+                memberLog.memlog_to = context.Member.Find(id).member_id;
+                break;
+            case "로그인" :
+                memberLog.memlog_type = "로그인";
+                memberLog.memlog_from = context.Member.Find(id).member_id;
+                memberLog.memlog_to = context.Member.Find(id).member_id;
+                break;
+            case "로그아웃" :
+                memberLog.memlog_type = "로그아웃";
+                memberLog.memlog_from = session.GetString("member_id");
+                memberLog.memlog_to = session.GetString("member_id");
+                break;
+            case "비밀번호 초기화" :
+                memberLog.memlog_type = "비밀번호 초기화";
+                memberLog.memlog_from = session.GetString("member_id");
+                memberLog.memlog_to = context.Member.Find(id).member_id;
+                break;
+        }
         context.MemberLog.Add(memberLog);
     }
-
 }
