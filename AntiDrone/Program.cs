@@ -18,7 +18,6 @@ builder.Services.AddScoped<IWhitelistService, WhitelistService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IMemberService, MemberService>();
 builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
-builder.Services.AddScoped<IMemberLogService, MemberLogService>();
 
 builder.Services.AddDistributedMemoryCache();
 
