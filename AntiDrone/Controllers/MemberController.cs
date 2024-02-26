@@ -33,7 +33,7 @@ namespace AntiDrone.Controllers
         [ProducesResponseType(200)]
         public async Task<IActionResult> Logout()
         {
-            return Json(await _memberService.Logout());
+            return Json(await _memberService.Logout(_context));
         }
         
         // 회원 정보 개별 조회

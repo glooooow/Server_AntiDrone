@@ -71,15 +71,18 @@ public class MemberService : IMemberService
         }
         var mem_index = checkMember.id;
         LatestLogin(mem_index, context);
+        await context.SaveChangesAsync();
+        
         return ResponseGlobal<Member.MemberBasicInfo>.Success(memberBasicInfo);
     }
 
-    public async Task<object> Logout()
+    public async Task<object> Logout(AntiDroneContext context)
     {
         var session = _httpContextAccessor.HttpContext.Session;
         var cookieReq = _httpContextAccessor.HttpContext.Request.Cookies;
         var cookieRes = _httpContextAccessor.HttpContext.Response.Cookies;
         
+        RecordLogout(context);
         session.Remove("member_id");
         session.Remove("authority");
         
@@ -88,6 +91,7 @@ public class MemberService : IMemberService
         {
             cookieRes.Delete("AntiDroneSession");
         }
+        await context.SaveChangesAsync();
 
         return ResponseGlobal<string>.Success("성공적으로 로그아웃 하였습니다.");
     }
@@ -279,7 +283,35 @@ public class MemberService : IMemberService
         if (loginMember != null)
         {
             loginMember.latest_access_datetime = latestTime;
-            context.SaveChangesAsync();
+            
+            /* 로그인 이력 저장 */
+            MemberLog memberLog = new MemberLog();
+            
+            memberLog.memlog_type = "로그인";
+            memberLog.memlog_level = "INFO";
+            memberLog.memlog_from = context.Member.Find(id).member_id;
+            memberLog.memlog_to = context.Member.Find(id).member_id;
+            memberLog.memlog_datetime = loginMember.latest_access_datetime;
+        
+            context.MemberLog.Add(memberLog);
         }
     }
+    
+    // 로그아웃 이력 저장
+    public void RecordLogout(AntiDroneContext context)
+    {
+        var session = _httpContextAccessor.HttpContext.Session;
+        
+        MemberLog memberLog = new MemberLog();
+        DateTime logoutDateTime = DateTime.Now;
+        
+        memberLog.memlog_type = "로그아웃";
+        memberLog.memlog_level = "INFO";
+        memberLog.memlog_from = session.GetString("member_id");
+        memberLog.memlog_to = session.GetString("member_id");
+        memberLog.memlog_datetime = logoutDateTime;
+
+        context.MemberLog.Add(memberLog);
+    }
+
 }
