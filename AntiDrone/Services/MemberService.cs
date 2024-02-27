@@ -126,24 +126,32 @@ public class MemberService : IMemberService
         }
         
         /* request 모델로 넘어오는 null 값 처리 */
-        if (request.member_pw != null)
+        if (memberNow.member_id == session.GetString("member_id") && (request.member_pw != null)) /* 비밀번호 변경은 본인일 경우만 가능, 관리자가 변경시 초기화 메소드 사용 */
         {
             var encryptPw = PasswordHasher.HashPassword(request.member_pw);
             request.member_pw = encryptPw; /* context.Member.Find(id).member_pw를 변수로 담아 사용하면 값을 복사하여 원래의 객체에 영향을 줄 수 X, 따라서 직접 선언 */
+        }
+        else if (memberNow.member_id != session.GetString("member_id"))
+        {
+            return ResponseGlobal<object>.Fail(ErrorCode.NoAuthority);
         }
         else
         {
             request.member_pw = memberNow.member_pw;
         }
 
-        /* 요청 전부터 모델에서 넘어오는 프레임워크 단의 디폴트 처리 값(0 = 미할당)을 기존 DB값으로 유지하기 위함 */
+        /* 권한 검사 및 요청 전부터 모델에서 넘어오는 프레임워크 단의 디폴트 처리 값(0 = 미할당)을 기존 DB값으로 유지하기 위함 */
         if (request.authority == 0)
         {
             request.authority = memberNow.authority;
         }
-        else if (request.authority == 1 | request.authority == 2 | request.authority == 3 )
+        else if ((session.GetInt32("authority") != 1) && (request.authority == 1 | request.authority == 2 | request.authority == 3))
         {
             RecordMemberLog(id, "권한 변경", context);
+        }
+        else if ((session.GetInt32("authority") != 1) && (request.authority == 1 | request.authority == 2 | request.authority == 3))
+        {
+            return ResponseGlobal<object>.Fail(ErrorCode.NoAuthority);
         }
         else
         {
@@ -155,9 +163,13 @@ public class MemberService : IMemberService
         {
             request.permission_state = memberNow.permission_state;
         }
-        else if (request.permission_state == 1)
+        else if ((session.GetInt32("authority") == 1) && request.permission_state == 1)
         {
             RecordMemberLog(id, "가입 승인", context);
+        }
+        else if ((session.GetInt32("authority") != 1) && request.permission_state == 1)
+        {
+            return ResponseGlobal<object>.Fail(ErrorCode.NoAuthority);
         }
         else
         {
