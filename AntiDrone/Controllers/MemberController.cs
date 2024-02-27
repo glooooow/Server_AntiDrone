@@ -77,7 +77,7 @@ namespace AntiDrone.Controllers
         }
         
         // 비밀번호 초기화 (관리자용 기능)
-        [HttpPost("{id}/resetPw", Name = "ResetPassword")]
+        [HttpPost("{id}/ResetPassword", Name = "ResetPassword")]
         [ProducesResponseType(200)]
         public async Task<IActionResult> ResetPassword(long id, string resetPassword)
         {
@@ -88,5 +88,44 @@ namespace AntiDrone.Controllers
         {
             return (_context.Member?.Any(e => e.id == id)).GetValueOrDefault();
         }
+        
+        
+        
+        
+        //------------------------------ 사용자 관리 메뉴 기능 ------------------------------
+        
+        // 사용자 전체 목록 조회
+        // 로그인/로그아웃 이력 목록 조회
+        [HttpGet("/AllMembers", Name = "GetAllMemberList")]
+        [ProducesResponseType(200)]
+        public async Task<IActionResult> GetAllMemberList()
+        {
+            return Json(await _memberService.GetAllMemberList(_context));
+        }
+        
+        // 로그인/로그아웃 이력 목록 조회
+        [HttpGet("/Singinouts", Name = "GetSigninoutLogs")]
+        [ProducesResponseType(200)]
+        public async Task<IActionResult> GetSigninoutLogs()
+        {
+            return Json(await _memberService.GetSigninoutLogs(_context));
+        }
+        
+        // 그 외 작업(사용자 정보 변경) 이력 목록 조회
+        [HttpGet("/MemberChanges", Name = "GetMemberChangedLogs")]
+        [ProducesResponseType(200)]
+        public async Task<IActionResult> GetMemberChangedLogs()
+        {
+            return Json(await _memberService.GetMemberChangedLogs(_context));
+        }
+        
+        // 가입 승인 대기 목록 조회
+        [HttpGet("/NeedApprovals", Name = "GetPendingApprovalList")]
+        [ProducesResponseType(200)]
+        public async Task<IActionResult> GetPendingApprovalList()
+        {
+            return Json(await _memberService.GetPendingApprovalList(_context));
+        }
+        
     }
 }

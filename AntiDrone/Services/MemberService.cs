@@ -8,6 +8,7 @@ using AntiDrone.Services.Interfaces;
 using AntiDrone.Utils;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.EntityFrameworkCore;
 
 namespace AntiDrone.Services;
 
@@ -292,6 +293,108 @@ public class MemberService : IMemberService
         return ResponseGlobal<string>.Success("비밀번호 초기화 완료");
     }
 
+    
+    
+    
+    
+    //------------------------------ 사용자 관리 메뉴 기능 ------------------------------
+    
+    public async Task<object> GetAllMemberList(AntiDroneContext context)
+    {
+        /* 관리자 권한이 있는지 세션 확인 위함 */
+        var session = _httpContextAccessor.HttpContext.Session;
+        
+        if (context.Member == null)
+        {
+            return ResponseGlobal<List<Member>>.Fail(ErrorCode.NoData);
+        }
+
+        if (session.GetInt32("authority") != 1 && context.Member != null)
+        {
+            return ResponseGlobal<object>.Fail(ErrorCode.NoAuthority);
+        } 
+
+        using (context) /* 응답값 커스텀하기 위함 */
+        {
+            var members = await context.Member
+                .Select(r => new 
+                { r.id, r.authority, r.permission_state, r.member_id, member_pw = "비밀번호", r.member_name }).Where(r => r.permission_state == 1).ToListAsync();
+            
+            return ResponseGlobal<object>.Success(members);
+        }
+    }
+
+    public async Task<object> GetSigninoutLogs(AntiDroneContext context)
+    {
+        var session = _httpContextAccessor.HttpContext.Session;
+        
+        if (context.MemberLog == null)
+        {
+            return ResponseGlobal<List<Member>>.Fail(ErrorCode.NoData);
+        }
+
+        if (session.GetInt32("authority") != 1 && context.MemberLog != null)
+        {
+            return ResponseGlobal<object>.Fail(ErrorCode.NoAuthority);
+        } 
+        
+        using (context)
+        {
+            var logs = await context.MemberLog
+                .Where(r => r.memlog_type == "로그인" || r.memlog_type == "로그아웃").ToListAsync();
+            
+            return ResponseGlobal<object>.Success(logs);
+        }
+    }
+
+    public async Task<object> GetMemberChangedLogs(AntiDroneContext context)
+    {
+        var session = _httpContextAccessor.HttpContext.Session;
+        
+        if (context.MemberLog == null)
+        {
+            return ResponseGlobal<List<Member>>.Fail(ErrorCode.NoData);
+        }
+
+        if (session.GetInt32("authority") != 1 && context.MemberLog != null)
+        {
+            return ResponseGlobal<object>.Fail(ErrorCode.NoAuthority);
+        } 
+        
+        using (context)
+        {
+            var logs = await context.MemberLog
+                .Where(r => r.memlog_type == "권한 변경" || r.memlog_type == "가입 승인" || r.memlog_type == "비밀번호 초기화").ToListAsync();
+            
+            return ResponseGlobal<object>.Success(logs);
+        }
+    }
+
+    public async Task<object> GetPendingApprovalList(AntiDroneContext context)
+    {
+        var session = _httpContextAccessor.HttpContext.Session;
+        
+        if (context.Member == null)
+        {
+            return ResponseGlobal<List<Member>>.Fail(ErrorCode.NoData);
+        }
+
+        if (session.GetInt32("authority") != 1 && context.Member != null)
+        {
+            return ResponseGlobal<object>.Fail(ErrorCode.NoAuthority);
+        } 
+
+        using (context)
+        {
+            var members = await context.Member
+                .Select(r => new 
+                    { r.id, r.authority, r.permission_state, r.member_id, member_pw = "비밀번호", r.member_name }).Where(r => r.permission_state == -1).ToListAsync();
+            
+            return ResponseGlobal<object>.Success(members);
+        }
+    }
+
+    
 
     //------------------------------ void 및 클래스 내 util 함수 ------------------------------
     

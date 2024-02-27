@@ -5,6 +5,7 @@ public enum ErrorCode
     NotWriteValue,
     UnknownError,
     FeatureNotExist,
+    NoData,
     NotFound,
     NoAuthority,
     BadRequest,
@@ -24,6 +25,8 @@ static class ErrorMessage {
                 return "알 수 없는 에러가 발생하였습니다.";
             case ErrorCode.FeatureNotExist:
                 return "현재 지원하지 않는 기능입니다.";
+            case ErrorCode.NoData:
+                return "요청하신 사항에 대한 데이터가 없습니다.";
             case ErrorCode.NotFound:
                 return "요청에 대한 응답을 찾을 수 없습니다.";
             case ErrorCode.NoAuthority:
