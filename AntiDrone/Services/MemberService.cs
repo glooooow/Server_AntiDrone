@@ -31,6 +31,8 @@ public class MemberService : IMemberService
         var checkMember = (context.Member.FirstOrDefault(member => member.member_id == loginModel.member_id));
         var validateMember = PasswordHasher.VerifyHashedPassword(loginModel.member_pw, checkMember.member_pw);
 
+        var session = _httpContextAccessor.HttpContext.Session;
+
         if (checkMember == null || validateMember == false)
         {
             return ResponseGlobal<object>.Fail(ErrorCode.InvalidAccount);
@@ -50,18 +52,18 @@ public class MemberService : IMemberService
                     return ResponseGlobal<string>.Success("관리자에게 가입 승인을 요청하세요.");
                 
                 case 1 :
-                    _httpContextAccessor.HttpContext.Session.SetString("member_id", loginModel.member_id);
-                    _httpContextAccessor.HttpContext.Session.SetInt32("authority", 1);
+                    session.SetString("member_id", loginModel.member_id);
+                    session.SetInt32("authority", 1);
                     break;
                 
                 case 2 :
-                    _httpContextAccessor.HttpContext.Session.SetString("member_id", loginModel.member_id);
-                    _httpContextAccessor.HttpContext.Session.SetInt32("authority", 2);
+                    session.SetString("member_id", loginModel.member_id);
+                    session.SetInt32("authority", 2);
                     break;
                 
                 case 3 :
-                    _httpContextAccessor.HttpContext.Session.SetString("member_id", loginModel.member_id);
-                    _httpContextAccessor.HttpContext.Session.SetInt32("authority", 3);
+                    session.SetString("member_id", loginModel.member_id);
+                    session.SetInt32("authority", 3);
                     break;
             }
         }
@@ -124,8 +126,15 @@ public class MemberService : IMemberService
         }
         
         /* request 모델로 넘어오는 null 값 처리 */
-        if (request.member_pw == null)
+        if (request.member_pw != null)
+        {
+            var encryptPw = PasswordHasher.HashPassword(request.member_pw);
+            request.member_pw = encryptPw; /* context.Member.Find(id).member_pw를 변수로 담아 사용하면 값을 복사하여 원래의 객체에 영향을 줄 수 X, 따라서 직접 선언 */
+        }
+        else
+        {
             request.member_pw = memberNow.member_pw;
+        }
 
         /* 요청 전부터 모델에서 넘어오는 프레임워크 단의 디폴트 처리 값(0 = 미할당)을 기존 DB값으로 유지하기 위함 */
         if (request.authority == 0)
@@ -164,6 +173,7 @@ public class MemberService : IMemberService
             }
         }
         await context.SaveChangesAsync();
+        memberNow.member_pw = "비밀번호";
         return ResponseGlobal<Member>.Success(memberNow);
     }
 
