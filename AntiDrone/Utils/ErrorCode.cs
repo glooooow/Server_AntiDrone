@@ -7,6 +7,7 @@ public enum ErrorCode
     FeatureNotExist,
     NotFound,
     NoAuthority,
+    BadRequest,
     NeedToLogin,
     ExistedAccount,
     InvalidAccount,
@@ -27,6 +28,8 @@ static class ErrorMessage {
                 return "요청에 대한 응답을 찾을 수 없습니다.";
             case ErrorCode.NoAuthority:
                 return "접근 권한이 없습니다.";
+            case ErrorCode.BadRequest:
+                return "올바르지 않은 요청입니다. 다시 확인해주시기 바랍니다.";
             case ErrorCode.NeedToLogin:
                 return "로그인이 필요합니다.";
             case ErrorCode.ExistedAccount:
@@ -36,7 +39,7 @@ static class ErrorMessage {
             case ErrorCode.NotAllowedId:
                 return "아이디는 영문(소문자) 또는 영문을 포함한 숫자로 입력해주세요.(최대 20자)";
             case ErrorCode.NotAllowedName:
-                return "한글 이름을 올바르게 입력해주세요.(최대 7자)";
+                return "한글 이름을 올바르게 입력해주세요.(최대 7자)";            
         }
         return String.Empty;
     }

@@ -40,8 +40,5 @@ public class UpdateMemberInfo
 {
     public int authority { get; set; }
     public int permission_state { get; set; }
-    [Required(ErrorMessage ="비밀번호를 입력하세요.")]
-    public string member_pw { get; set; } /* 회원 패스워드 */
-    public string member_email { get; set; } /* 회원 이메일 */
-    public string member_contact { get; set; } /* 회원 연락처 */
+    public string? member_pw { get; set; }
 }

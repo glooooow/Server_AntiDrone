@@ -123,21 +123,39 @@ public class MemberService : IMemberService
             return ResponseGlobal<UpdateMemberInfo>.Fail(ErrorCode.NotFound);
         }
         
-        var modelState = _actionContextAccessor.ActionContext.ModelState; /* 모델의 상태를 호출하여 커스텀하기 위함 */
-       if (modelState.ContainsKey("member_id") && modelState.ContainsKey("member_name")) /* 모델의 Required 속성을 일시적으로 무시 */
+        /* request 모델로 넘어오는 null 값 처리 */
+        if (request.member_pw == null)
+            request.member_pw = memberNow.member_pw;
+
+        /* 요청 전부터 모델에서 넘어오는 프레임워크 단의 디폴트 처리 값(0 = 미할당)을 기존 DB값으로 유지하기 위함 */
+        if (request.authority == 0)
         {
-            modelState["member_id"].Errors.Clear();
-            modelState["member_name"].Errors.Clear();
-        }
-       
-        if (request.authority == 0) /* 요청 전부터 모델에서 넘어오는 프레임워크 단의 디폴트 처리 값(0 = 미할당)을 기존 DB값으로 유지하기 위함 */
             request.authority = memberNow.authority;
-        
-        if (request.permission_state == 0) /* 위의 authority와 마찬가지의 방식으로 permission_state 처리 */
+        }
+        else if (request.authority == 1 | request.authority == 2 | request.authority == 3 )
+        {
+            RecordMemberLog(id, "권한 변경", context);
+        }
+        else
+        {
+            return ResponseGlobal<object>.Fail(ErrorCode.BadRequest);
+        }
+
+        /* authority와 마찬가지의 방식으로 permission_state 처리 */
+        if (request.permission_state == 0)
+        {
             request.permission_state = memberNow.permission_state;
+        }
+        else if (request.permission_state == 1)
+        {
+            RecordMemberLog(id, "가입 승인", context);
+        }
+        else
+        {
+            return ResponseGlobal<object>.Fail(ErrorCode.BadRequest);
+        }
         
         var properties = request.GetType().GetProperties();
-
         foreach (var property in properties)
         {
             if (property.GetValue(request) != null)
