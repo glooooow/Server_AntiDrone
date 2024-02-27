@@ -95,7 +95,6 @@ namespace AntiDrone.Controllers
         //------------------------------ 사용자 관리 메뉴 기능 ------------------------------
         
         // 사용자 전체 목록 조회
-        // 로그인/로그아웃 이력 목록 조회
         [HttpGet("/AllMembers", Name = "GetAllMemberList")]
         [ProducesResponseType(200)]
         public async Task<IActionResult> GetAllMemberList()
