@@ -318,7 +318,7 @@ public class MemberService : IMemberService
         {
             var members = await context.Member
                 .Select(r => new 
-                { r.id, r.authority, r.permission_state, r.member_id, member_pw = "비밀번호", r.member_name }).Where(r => r.permission_state == 1).ToListAsync();
+                { r.id, r.authority, r.permission_state, r.member_id, /* member_pw = "비밀번호", */ r.member_name }).Where(r => r.permission_state == 1).ToListAsync();
             
             return ResponseGlobal<object>.Success(members);
         }
@@ -388,7 +388,7 @@ public class MemberService : IMemberService
         {
             var members = await context.Member
                 .Select(r => new 
-                    { r.id, r.authority, r.permission_state, r.member_id, member_pw = "비밀번호", r.member_name }).Where(r => r.permission_state == -1).ToListAsync();
+                    { r.id, r.authority, r.permission_state, r.member_id, /* member_pw = "비밀번호", */ r.member_name }).Where(r => r.permission_state == -1).ToListAsync();
             
             return ResponseGlobal<object>.Success(members);
         }
