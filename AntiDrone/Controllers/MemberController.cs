@@ -77,7 +77,7 @@ namespace AntiDrone.Controllers
         }
         
         // 비밀번호 초기화 (관리자용 기능)
-        [HttpPost("{id}/ResetPassword", Name = "ResetPassword")]
+        [HttpPost("{id}", Name = "ResetPassword")]
         [ProducesResponseType(200)]
         public async Task<IActionResult> ResetPassword(long id, string resetPassword)
         {
