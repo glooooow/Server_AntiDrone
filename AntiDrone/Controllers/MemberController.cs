@@ -103,7 +103,7 @@ namespace AntiDrone.Controllers
         }
         
         // 로그인/로그아웃 이력 목록 조회
-        [HttpGet("/Singinouts", Name = "GetSigninoutLogs")]
+        [HttpGet("/Signinouts", Name = "GetSigninoutLogs")]
         [ProducesResponseType(200)]
         public async Task<IActionResult> GetSigninoutLogs()
         {
