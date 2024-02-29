@@ -86,16 +86,21 @@ public class MemberService : IMemberService
         var cookieReq = _httpContextAccessor.HttpContext.Request.Cookies;
         var cookieRes = _httpContextAccessor.HttpContext.Response.Cookies;
         
-        RecordMemberLog(0, "로그아웃", context);
-        session.Remove("member_id");
-        session.Remove("authority");
+        if (cookieReq.ContainsKey("AntiDroneSession") == false) /* 로그인 정보가 없을 때 */
+        {
+            return ResponseGlobal<object>.Fail(ErrorCode.BadRequest);
+        }
         
+            RecordMemberLog(0, "로그아웃", context); /* 세션에서 id 정보를 받아서 저장해야하므로 제거 전에 실행 */
+            session.Remove("member_id");
+            session.Remove("authority");
+
         /* 쿠키가 있으면 제거 */
         if (cookieReq.ContainsKey("AntiDroneSession"))
         {
             cookieRes.Delete("AntiDroneSession");
         }
-
+        await context.SaveChangesAsync();
         return ResponseGlobal<string>.Success("성공적으로 로그아웃 하였습니다.");
     }
 
@@ -439,7 +444,8 @@ public class MemberService : IMemberService
         DateTime logOccurTime = DateTime.Now;
         
         var session = _httpContextAccessor.HttpContext.Session;
-        
+        var nowLogin = session.GetString("member_id");
+
         memberLog.memlog_level = "INFO";
         memberLog.memlog_datetime = logOccurTime;
         
@@ -447,12 +453,12 @@ public class MemberService : IMemberService
         {
             case "회원가입" :
                 memberLog.memlog_type = "회원가입";
-                memberLog.memlog_from = context.Member.Find(id).member_id;
+                memberLog.memlog_from = context.Member.Find(id).member_id; /* 변수로 선언해서 index를 직접 넣어 찾지 않으면 오류 발생 */
                 memberLog.memlog_to = context.Member.Find(id).member_id;
                 break;
             case "가입 승인" :
                 memberLog.memlog_type = "가입 승인";
-                memberLog.memlog_from = session.GetString("member_id");
+                memberLog.memlog_from = nowLogin;
                 memberLog.memlog_to = context.Member.Find(id).member_id;
                 break;
             case "로그인" :
@@ -462,20 +468,21 @@ public class MemberService : IMemberService
                 break;
             case "로그아웃" :
                 memberLog.memlog_type = "로그아웃";
-                memberLog.memlog_from = session.GetString("member_id");
-                memberLog.memlog_to = session.GetString("member_id");
+                memberLog.memlog_from = nowLogin;
+                memberLog.memlog_to = nowLogin;
                 break;
             case "비밀번호 초기화" :
                 memberLog.memlog_type = "비밀번호 초기화";
-                memberLog.memlog_from = session.GetString("member_id");
+                memberLog.memlog_from = nowLogin;
                 memberLog.memlog_to = context.Member.Find(id).member_id;
                 break;
             case "권한 변경" :
                 memberLog.memlog_type = "권한 변경";
-                memberLog.memlog_from = session.GetString("member_id");
+                memberLog.memlog_from = nowLogin;
                 memberLog.memlog_to = context.Member.Find(id).member_id;
                 break;
         }
-        context.MemberLog.Add(memberLog);
+        if(nowLogin != null)
+        context.MemberLog.Add(memberLog); /* 저장은 호출 함수에서 실행(이중으로 저장처리 할 경우 비동기 오류가 발생하기 때문) */
     }
 }
