@@ -95,7 +95,6 @@ public class MemberService : IMemberService
         {
             cookieRes.Delete("AntiDroneSession");
         }
-        await context.SaveChangesAsync();
 
         return ResponseGlobal<string>.Success("성공적으로 로그아웃 하였습니다.");
     }
@@ -116,7 +115,7 @@ public class MemberService : IMemberService
         var LoginSession = session.GetInt32("authority");
         if (LoginSession == null)
         {
-            return ResponseGlobal<object>.Fail(ErrorCode.NoAuthority);
+            return ResponseGlobal<object>.Fail(ErrorCode.NeedToLogin);
         }
 
         /* 해당 회원 데이터가 있는지 탐색 */
@@ -132,7 +131,7 @@ public class MemberService : IMemberService
             var encryptPw = PasswordHasher.HashPassword(request.member_pw);
             request.member_pw = encryptPw; /* context.Member.Find(id).member_pw를 변수로 담아 사용하면 값을 복사하여 원래의 객체에 영향을 줄 수 X, 따라서 직접 선언 */
         }
-        else if (memberNow.member_id != session.GetString("member_id"))
+        else if (memberNow.member_id != session.GetString("member_id") && (request.member_pw != null))
         {
             return ResponseGlobal<object>.Fail(ErrorCode.NoAuthority);
         }
@@ -146,7 +145,7 @@ public class MemberService : IMemberService
         {
             request.authority = memberNow.authority;
         }
-        else if ((session.GetInt32("authority") != 1) && (request.authority == 1 | request.authority == 2 | request.authority == 3))
+        else if ((session.GetInt32("authority") == 1) && (request.authority == 1 | request.authority == 2 | request.authority == 3))
         {
             RecordMemberLog(id, "권한 변경", context);
         }
