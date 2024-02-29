@@ -91,16 +91,13 @@ public class MemberService : IMemberService
             return ResponseGlobal<object>.Fail(ErrorCode.BadRequest);
         }
         
-            RecordMemberLog(0, "로그아웃", context); /* 세션에서 id 정보를 받아서 저장해야하므로 제거 전에 실행 */
-            session.Remove("member_id");
-            session.Remove("authority");
-
-        /* 쿠키가 있으면 제거 */
-        if (cookieReq.ContainsKey("AntiDroneSession"))
-        {
-            cookieRes.Delete("AntiDroneSession");
-        }
+        RecordMemberLog(0, "로그아웃", context); /* 세션에서 id 정보를 받아서 저장해야하므로 제거 전에 실행 */
+        session.Remove("member_id");
+        session.Remove("authority");
+        
+        cookieRes.Delete("AntiDroneSession"); /* 쿠키까지 제거 */
         await context.SaveChangesAsync();
+        
         return ResponseGlobal<string>.Success("성공적으로 로그아웃 하였습니다.");
     }
 
