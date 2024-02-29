@@ -24,7 +24,7 @@ builder.Services.AddDistributedMemoryCache();
 // 세션 사용하기 위해 추가
 builder.Services.AddSession(options =>
 {
-   // options.IdleTimeout = TimeSpan.FromMinutes(30); /* 지속 시간 */
+    options.IdleTimeout = TimeSpan.FromDays(100000); /* 지속 시간 : 지정하지 않으면 기본 20분 */
     options.Cookie.Name = "AntiDroneSession"; /* 세션명 */
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
