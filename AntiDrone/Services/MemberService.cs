@@ -303,8 +303,12 @@ public class MemberService : IMemberService
 
     public async Task<object> FindAllowedMember(Expression<Func<Member, bool>> condition, AntiDroneContext context)
     {
-        using (context)
+        using (context) /* 응답값 커스텀하기 위함 */
         {
+            if (condition == null) /* 검색 유형 및 키워드로 걸어야하는 조건이 아예 없을 때 */
+            {
+                condition = r => true; /* 기본 반환값을 true로 세팅 */
+            }
             var members = context.Member
                 .Where(condition)
                 .Select(r => new
@@ -370,72 +374,12 @@ public class MemberService : IMemberService
                 }
             }
         }
-
-        // if (searchKeyword != null)
-        // {
-        //     switch (searchType)
-        //     {
-        //         case "ID" :
-        //             using (context)
-        //             {
-        //                 var members = await context.Member
-        //                     .Select(r => new 
-        //                         { r.id, r.authority, r.permission_state, r.member_id, r.member_name }).Where(r => r.permission_state == 1 && r.member_id.Contains(searchKeyword)).ToListAsync();
-        //                 
-        //                 return ResponseGlobal<object>.Success(members);
-        //             }
-        //
-        //         case "이름" :
-        //             using (context)
-        //             {
-        //                 var members = await context.Member
-        //                     .Select(r => new 
-        //                         { r.id, r.authority, r.permission_state, r.member_id, r.member_name }).Where(r => r.permission_state == 1 && r.member_name.Contains(searchKeyword)).ToListAsync();
-        //     
-        //                 return ResponseGlobal<object>.Success(members);
-        //             }
-        //             
-        //         case "권한" :
-        //             switch (searchKeyword)
-        //             {
-        //                 case "관리자" : case "관리" :
-        //                     using (context)
-        //                     {
-        //                         var members = await context.Member
-        //                             .Select(r => new 
-        //                                 { r.id, r.authority, r.permission_state, r.member_id, r.member_name }).Where(r => r.permission_state == 1 && r.authority == 1).ToListAsync();
-        //     
-        //                         return ResponseGlobal<object>.Success(members);
-        //                     }
-        //                 case "운영자" : case "운영" :
-        //                     using (context)
-        //                     {
-        //                         var members = await context.Member
-        //                             .Select(r => new 
-        //                                 { r.id, r.authority, r.permission_state, r.member_id, r.member_name }).Where(r => r.permission_state == 1 && r.authority == 2).ToListAsync();
-        //     
-        //                         return ResponseGlobal<object>.Success(members);
-        //                     }
-        //                 case "일반" :
-        //                     using (context)
-        //                     {
-        //                         var members = await context.Member
-        //                             .Select(r => new 
-        //                                 { r.id, r.authority, r.permission_state, r.member_id, r.member_name }).Where(r => r.permission_state == 1 && r.authority == 3).ToListAsync();
-        //     
-        //                         return ResponseGlobal<object>.Success(members);
-        //                     }
-        //             }
-        //             break;
-        //     }
-        // }
-        //
-        using (context) /* 응답값 커스텀하기 위함 */
+        
+        using (context)
         {
-            var members = await context.Member
-                .Select(r => new 
-                { r.id, r.authority, r.permission_state, r.member_id, r.member_name }).Where(r => r.permission_state == 1).ToListAsync();
+            Expression<Func<Member, bool>> condition = null;
             
+            var members = await FindAllowedMember(condition, context);
             return ResponseGlobal<object>.Success(members);
         }
     }
