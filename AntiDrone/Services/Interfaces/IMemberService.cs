@@ -13,7 +13,7 @@ public interface IMemberService
     Task<object> Register(Member member, AntiDroneContext context);
     Task<object> FindAccount(string name, AntiDroneContext context);
     Task<object> ResetPassword(long id, string resetPassword, AntiDroneContext context);
-    Task<object> GetAllMemberList(AntiDroneContext context);
+    Task<object> GetAllMemberList(string? searchType, string? searchKeyword, AntiDroneContext context);
     Task<object> GetSigninoutLogs(AntiDroneContext context);
     Task<object> GetMemberChangedLogs(AntiDroneContext context);
     Task<object> GetPendingApprovalList(AntiDroneContext context);

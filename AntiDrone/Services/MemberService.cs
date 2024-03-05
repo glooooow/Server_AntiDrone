@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Linq.Expressions;
+using System.Reflection;
 using System.Runtime.InteropServices.JavaScript;
 using System.Text.RegularExpressions;
 using AntiDrone.Data;
@@ -299,27 +300,141 @@ public class MemberService : IMemberService
     
     
     //------------------------------ 사용자 관리 메뉴 기능 ------------------------------
+
+    public async Task<object> FindAllowedMember(Expression<Func<Member, bool>> condition, AntiDroneContext context)
+    {
+        using (context)
+        {
+            var members = context.Member
+                .Where(condition)
+                .Select(r => new
+                    { r.id, r.authority, r.permission_state, r.member_id, r.member_name })
+                .Where(r=> r.permission_state == 1)
+                .ToListAsync();
+            
+            return await members;
+        }
+    }
     
-    public async Task<object> GetAllMemberList(AntiDroneContext context)
+    
+    public async Task<object> GetAllMemberList(string? searchType, string? searchKeyword, AntiDroneContext context)
     {
         /* 관리자 권한이 있는지 세션 확인 위함 */
         var session = _httpContextAccessor.HttpContext.Session;
+        
+        if (session.GetInt32("authority") != 1 && context.Member != null)
+        {
+            return ResponseGlobal<object>.Fail(ErrorCode.NoAuthority);
+        }
         
         if (context.Member == null)
         {
             return ResponseGlobal<List<Member>>.Fail(ErrorCode.NoData);
         }
-
-        if (session.GetInt32("authority") != 1 && context.Member != null)
+        
+        if (searchKeyword != null)
         {
-            return ResponseGlobal<object>.Fail(ErrorCode.NoAuthority);
-        } 
+            Expression<Func<Member, bool>> condition = null;
+            switch (searchType)
+            {
+                case "ID":
+                    condition = r => r.member_id.Contains(searchKeyword);
+                    break;
 
+                case "이름":
+                    condition = r => r.member_name.Contains(searchKeyword);
+                    break;
+                
+                case "권한":
+                    switch (searchKeyword)
+                    {
+                        case "관리자": case "관리":
+                            condition = r => r.authority == 1;
+                            break;
+                        case "운영자": case "운영":
+                            condition = r => r.authority == 2;
+                            break;
+                        case "일반":
+                            condition = r => r.authority == 3;
+                            break;
+                    }
+                    break;
+            }
+
+            if (condition != null)
+            {
+                using (context)
+                {
+                    var members = await FindAllowedMember(condition, context);
+                    return ResponseGlobal<object>.Success(members);
+                }
+            }
+        }
+
+        // if (searchKeyword != null)
+        // {
+        //     switch (searchType)
+        //     {
+        //         case "ID" :
+        //             using (context)
+        //             {
+        //                 var members = await context.Member
+        //                     .Select(r => new 
+        //                         { r.id, r.authority, r.permission_state, r.member_id, r.member_name }).Where(r => r.permission_state == 1 && r.member_id.Contains(searchKeyword)).ToListAsync();
+        //                 
+        //                 return ResponseGlobal<object>.Success(members);
+        //             }
+        //
+        //         case "이름" :
+        //             using (context)
+        //             {
+        //                 var members = await context.Member
+        //                     .Select(r => new 
+        //                         { r.id, r.authority, r.permission_state, r.member_id, r.member_name }).Where(r => r.permission_state == 1 && r.member_name.Contains(searchKeyword)).ToListAsync();
+        //     
+        //                 return ResponseGlobal<object>.Success(members);
+        //             }
+        //             
+        //         case "권한" :
+        //             switch (searchKeyword)
+        //             {
+        //                 case "관리자" : case "관리" :
+        //                     using (context)
+        //                     {
+        //                         var members = await context.Member
+        //                             .Select(r => new 
+        //                                 { r.id, r.authority, r.permission_state, r.member_id, r.member_name }).Where(r => r.permission_state == 1 && r.authority == 1).ToListAsync();
+        //     
+        //                         return ResponseGlobal<object>.Success(members);
+        //                     }
+        //                 case "운영자" : case "운영" :
+        //                     using (context)
+        //                     {
+        //                         var members = await context.Member
+        //                             .Select(r => new 
+        //                                 { r.id, r.authority, r.permission_state, r.member_id, r.member_name }).Where(r => r.permission_state == 1 && r.authority == 2).ToListAsync();
+        //     
+        //                         return ResponseGlobal<object>.Success(members);
+        //                     }
+        //                 case "일반" :
+        //                     using (context)
+        //                     {
+        //                         var members = await context.Member
+        //                             .Select(r => new 
+        //                                 { r.id, r.authority, r.permission_state, r.member_id, r.member_name }).Where(r => r.permission_state == 1 && r.authority == 3).ToListAsync();
+        //     
+        //                         return ResponseGlobal<object>.Success(members);
+        //                     }
+        //             }
+        //             break;
+        //     }
+        // }
+        //
         using (context) /* 응답값 커스텀하기 위함 */
         {
             var members = await context.Member
                 .Select(r => new 
-                { r.id, r.authority, r.permission_state, r.member_id, /* member_pw = "비밀번호", */ r.member_name }).Where(r => r.permission_state == 1).ToListAsync();
+                { r.id, r.authority, r.permission_state, r.member_id, r.member_name }).Where(r => r.permission_state == 1).ToListAsync();
             
             return ResponseGlobal<object>.Success(members);
         }
@@ -365,7 +480,7 @@ public class MemberService : IMemberService
         using (context)
         {
             var logs = await context.MemberLog
-                .Where(r => r.memlog_type == "권한 변경" || r.memlog_type == "가입 승인" || r.memlog_type == "비밀번호 초기화").ToListAsync();
+                .Where(r => r.memlog_type == "회원가입" || r.memlog_type == "권한 변경" || r.memlog_type == "가입 승인" || r.memlog_type == "비밀번호 초기화").ToListAsync();
             
             return ResponseGlobal<object>.Success(logs);
         }
@@ -389,7 +504,7 @@ public class MemberService : IMemberService
         {
             var members = await context.Member
                 .Select(r => new 
-                    { r.id, r.authority, r.permission_state, r.member_id, /* member_pw = "비밀번호", */ r.member_name }).Where(r => r.permission_state == -1).ToListAsync();
+                    { r.id, r.authority, r.permission_state, r.member_id, r.member_name }).Where(r => r.permission_state == -1).ToListAsync();
             
             return ResponseGlobal<object>.Success(members);
         }
@@ -480,6 +595,6 @@ public class MemberService : IMemberService
                 break;
         }
         if(nowLogin != null)
-        context.MemberLog.Add(memberLog); /* 저장은 호출 함수에서 실행(이중으로 저장처리 할 경우 비동기 오류가 발생하기 때문) */
+            context.MemberLog.Add(memberLog); /* 저장은 호출 함수에서 실행(이중으로 저장처리 할 경우 비동기 오류가 발생하기 때문) */
     }
 }

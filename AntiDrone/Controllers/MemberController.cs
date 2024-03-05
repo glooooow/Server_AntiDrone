@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Mime;
 using AntiDrone.Data;
 using AntiDrone.Models.Systems.Member;
@@ -97,9 +98,9 @@ namespace AntiDrone.Controllers
         // 사용자 전체 목록 조회
         [HttpGet("/AllMembers", Name = "GetAllMemberList")]
         [ProducesResponseType(200)]
-        public async Task<IActionResult> GetAllMemberList()
+        public async Task<IActionResult> GetAllMemberList(string? searchType, string? searchKeyword)
         {
-            return Json(await _memberService.GetAllMemberList(_context));
+            return Json(await _memberService.GetAllMemberList(searchType, searchKeyword, _context));
         }
         
         // 로그인/로그아웃 이력 목록 조회
