@@ -16,5 +16,5 @@ public interface IMemberService
     Task<object> GetAllMemberList(string? searchType, string? searchKeyword, AntiDroneContext context);
     Task<object> GetSigninoutLogs(AntiDroneContext context);
     Task<object> GetMemberChangedLogs(AntiDroneContext context);
-    Task<object> GetPendingApprovalList(AntiDroneContext context);
+    Task<object> GetPendingApprovalList(string? searchType, string? searchKeyword, AntiDroneContext context);
 }

@@ -301,25 +301,30 @@ public class MemberService : IMemberService
     
     //------------------------------ 사용자 관리 메뉴 기능 ------------------------------
 
-    public async Task<object> FindAllowedMember(Expression<Func<Member, bool>>? condition, AntiDroneContext context)
+    private static async Task<object> FindMemberBase(Expression<Func<Member, bool>>? condition, Expression<Func<Member, bool>>? permissionState ,AntiDroneContext context)
     {
-        using (context) /* 응답값 커스텀하기 위함 */
+        await using (context) /* 응답값 커스텀하기 위함 */
         {
             if (condition == null) /* 검색 유형 및 키워드로 걸어야하는 조건이 아예 없을 때 */
             {
                 condition = r => true; /* 기본 반환값을 true로 세팅 */
             }
+
+            if (permissionState == null)
+            {
+                permissionState = r => true;
+            }
+            
             var members = context.Member
                 .Where(condition)
+                .Where(permissionState)
                 .Select(r => new
                     { r.id, r.authority, r.permission_state, r.member_id, r.member_name })
-                .Where(r=> r.permission_state == 1)
                 .ToListAsync();
             
             return await members;
         }
     }
-    
     
     public async Task<object> GetAllMemberList(string? searchType, string? searchKeyword, AntiDroneContext context)
     {
@@ -336,9 +341,12 @@ public class MemberService : IMemberService
             return ResponseGlobal<List<Member>>.Fail(ErrorCode.NoData);
         }
         
+        Expression<Func<Member, bool>> permissionState = r => r.permission_state == 1; /* 가입 승인된 회원만 조회 */
+        
         if (searchKeyword != null)
         {
             Expression<Func<Member, bool>> condition = null;
+            
             switch (searchType)
             {
                 case "ID":
@@ -361,6 +369,9 @@ public class MemberService : IMemberService
                         case "일반":
                             condition = r => r.authority == 3;
                             break;
+                        default:
+                            condition = r => r.authority == 99;
+                            break;
                     }
                     break;
             }
@@ -369,7 +380,7 @@ public class MemberService : IMemberService
             {
                 await using (context)
                 {
-                    var members = await FindAllowedMember(condition, context);
+                    var members = await FindMemberBase(condition, permissionState, context);
                     return ResponseGlobal<object>.Success(members);
                 }
             }
@@ -379,7 +390,7 @@ public class MemberService : IMemberService
         {
             Expression<Func<Member, bool>> condition = null;
             
-            var members = await FindAllowedMember(condition, context);
+            var members = await FindMemberBase(condition, permissionState, context);
             return ResponseGlobal<object>.Success(members);
         }
     }
@@ -430,7 +441,7 @@ public class MemberService : IMemberService
         }
     }
 
-    public async Task<object> GetPendingApprovalList(AntiDroneContext context)
+    public async Task<object> GetPendingApprovalList(string? searchType, string? searchKeyword, AntiDroneContext context)
     {
         var session = _httpContextAccessor.HttpContext.Session;
         
@@ -442,14 +453,40 @@ public class MemberService : IMemberService
         if (session.GetInt32("authority") != 1 && context.Member != null)
         {
             return ResponseGlobal<object>.Fail(ErrorCode.NoAuthority);
-        } 
-
-        using (context)
+        }
+        
+        Expression<Func<Member, bool>> permissionState = r => r.permission_state == -1; /* 가입 승인이 필요한 회원만 조회 */
+        
+        if (searchKeyword != null)
         {
-            var members = await context.Member
-                .Select(r => new 
-                    { r.id, r.authority, r.permission_state, r.member_id, r.member_name }).Where(r => r.permission_state == -1).ToListAsync();
+            Expression<Func<Member, bool>> condition = null;
             
+            switch (searchType)
+            {
+                case "ID":
+                    condition = r => r.member_id.Contains(searchKeyword);
+                    break;
+
+                case "이름":
+                    condition = r => r.member_name.Contains(searchKeyword);
+                    break;
+            }
+
+            if (condition != null)
+            {
+                await using (context)
+                {
+                    var members = await FindMemberBase(condition, permissionState, context);
+                    return ResponseGlobal<object>.Success(members);
+                }
+            }
+        }
+
+        await using (context)
+        {
+            Expression<Func<Member, bool>> condition = null;
+            
+            var members = await FindMemberBase(condition, permissionState, context);
             return ResponseGlobal<object>.Success(members);
         }
     }

@@ -122,9 +122,9 @@ namespace AntiDrone.Controllers
         // 가입 승인 대기 목록 조회
         [HttpGet("/NeedApprovals", Name = "GetPendingApprovalList")]
         [ProducesResponseType(200)]
-        public async Task<IActionResult> GetPendingApprovalList()
+        public async Task<IActionResult> GetPendingApprovalList(string? searchType, string? searchKeyword)
         {
-            return Json(await _memberService.GetPendingApprovalList(_context));
+            return Json(await _memberService.GetPendingApprovalList(searchType, searchKeyword, _context));
         }
         
     }
