@@ -301,7 +301,7 @@ public class MemberService : IMemberService
     
     //------------------------------ 사용자 관리 메뉴 기능 ------------------------------
 
-    public async Task<object> FindAllowedMember(Expression<Func<Member, bool>> condition, AntiDroneContext context)
+    public async Task<object> FindAllowedMember(Expression<Func<Member, bool>>? condition, AntiDroneContext context)
     {
         using (context) /* 응답값 커스텀하기 위함 */
         {
@@ -367,15 +367,15 @@ public class MemberService : IMemberService
 
             if (condition != null)
             {
-                using (context)
+                await using (context)
                 {
                     var members = await FindAllowedMember(condition, context);
                     return ResponseGlobal<object>.Success(members);
                 }
             }
         }
-        
-        using (context)
+
+        await using (context)
         {
             Expression<Func<Member, bool>> condition = null;
             
