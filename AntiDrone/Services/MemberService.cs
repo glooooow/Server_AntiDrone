@@ -326,6 +326,29 @@ public class MemberService : IMemberService
         }
     }
     
+    private static async Task<object> FindLogBase(Expression<Func<MemberLog, bool>>? basic, Expression<Func<MemberLog, bool>>? additional, AntiDroneContext context)
+    {
+        await using (context)
+        {
+            if (basic == null)
+            {
+                basic = r => true; /* 기본 반환값을 true로 세팅 */
+            }
+            
+            if (additional == null)
+            {
+                additional = r => true; /* 기본 반환값을 true로 세팅 */
+            }
+            
+            var logs = context.MemberLog
+                .Where(basic)
+                .Where(additional)
+                .ToListAsync();
+            
+            return await logs;
+        }
+    }
+    
     public async Task<object> GetAllMemberList(string? searchType, string? searchKeyword, AntiDroneContext context)
     {
         /* 관리자 권한이 있는지 세션 확인 위함 */
@@ -346,7 +369,6 @@ public class MemberService : IMemberService
         if (searchKeyword != null)
         {
             Expression<Func<Member, bool>> condition = null;
-            
             switch (searchType)
             {
                 case "ID":
@@ -395,7 +417,7 @@ public class MemberService : IMemberService
         }
     }
 
-    public async Task<object> GetSigninoutLogs(AntiDroneContext context)
+    public async Task<object> GetSigninoutLogs(string? searchType, string? searchKeyword, AntiDroneContext context)
     {
         var session = _httpContextAccessor.HttpContext.Session;
         
@@ -407,18 +429,43 @@ public class MemberService : IMemberService
         if (session.GetInt32("authority") != 1 && context.MemberLog != null)
         {
             return ResponseGlobal<object>.Fail(ErrorCode.NoAuthority);
-        } 
+        }
+
+        Expression<Func<MemberLog, bool>> basic = r => r.memlog_type == "로그인" || r.memlog_type == "로그아웃";
+        Expression<Func<MemberLog, bool>> additional = null;
+       
+        // 로그인 & 작업이력 통합으로 바꾼다고 하면 변경할 코드
+        // if (searchKeyword != null)
+        // {
+        //     switch (searchType)
+        //     {
+        //         case "유형":
+        //             additional = r => r.memlog_type == searchKeyword;
+        //             break;
+        //
+        //         case "From": case "FROM": case "from":
+        //             additional = r => r.memlog_from.Contains(searchKeyword);
+        //             break;
+        //         
+        //         case "To": case "TO": case "to":
+        //             additional = r => r.memlog_to.Contains(searchKeyword);
+        //             break;
+        //     }
+        // }
         
-        using (context)
+        if (searchKeyword != null && searchType == "메세지")
         {
-            var logs = await context.MemberLog
-                .Where(r => r.memlog_type == "로그인" || r.memlog_type == "로그아웃").ToListAsync();
-            
+            additional = r => (r.memlog_type.Contains(searchKeyword) || r.memlog_from.Contains(searchKeyword) || r.memlog_to.Contains(searchKeyword));
+        }
+
+        await using (context)
+        {
+            var logs = await FindLogBase(basic, additional, context);
             return ResponseGlobal<object>.Success(logs);
         }
     }
 
-    public async Task<object> GetMemberChangedLogs(AntiDroneContext context)
+    public async Task<object> GetMemberChangedLogs(string? searchType, string? searchKeyword, AntiDroneContext context)
     {
         var session = _httpContextAccessor.HttpContext.Session;
         
@@ -432,11 +479,17 @@ public class MemberService : IMemberService
             return ResponseGlobal<object>.Fail(ErrorCode.NoAuthority);
         } 
         
-        using (context)
+        Expression<Func<MemberLog, bool>> basic = r => r.memlog_type == "회원가입" || r.memlog_type == "권한 변경" || r.memlog_type == "가입 승인" || r.memlog_type == "비밀번호 초기화";
+        Expression<Func<MemberLog, bool>> additional = null;
+        
+        if (searchKeyword != null && searchType == "메세지")
         {
-            var logs = await context.MemberLog
-                .Where(r => r.memlog_type == "회원가입" || r.memlog_type == "권한 변경" || r.memlog_type == "가입 승인" || r.memlog_type == "비밀번호 초기화").ToListAsync();
-            
+            additional = r => (r.memlog_type.Contains(searchKeyword) || r.memlog_from.Contains(searchKeyword) || r.memlog_to.Contains(searchKeyword));
+        }
+
+        await using (context)
+        {
+            var logs = await FindLogBase(basic, additional, context);
             return ResponseGlobal<object>.Success(logs);
         }
     }

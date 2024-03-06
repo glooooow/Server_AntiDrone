@@ -106,17 +106,17 @@ namespace AntiDrone.Controllers
         // 로그인/로그아웃 이력 목록 조회
         [HttpGet("/Signinouts", Name = "GetSigninoutLogs")]
         [ProducesResponseType(200)]
-        public async Task<IActionResult> GetSigninoutLogs()
+        public async Task<IActionResult> GetSigninoutLogs(string? searchType, string? searchKeyword)
         {
-            return Json(await _memberService.GetSigninoutLogs(_context));
+            return Json(await _memberService.GetSigninoutLogs(searchType, searchKeyword, _context));
         }
         
         // 그 외 작업(사용자 정보 변경) 이력 목록 조회
         [HttpGet("/MemberChanges", Name = "GetMemberChangedLogs")]
         [ProducesResponseType(200)]
-        public async Task<IActionResult> GetMemberChangedLogs()
+        public async Task<IActionResult> GetMemberChangedLogs(string? searchType, string? searchKeyword)
         {
-            return Json(await _memberService.GetMemberChangedLogs(_context));
+            return Json(await _memberService.GetMemberChangedLogs(searchType, searchKeyword, _context));
         }
         
         // 가입 승인 대기 목록 조회

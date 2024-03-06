@@ -14,7 +14,7 @@ public interface IMemberService
     Task<object> FindAccount(string name, AntiDroneContext context);
     Task<object> ResetPassword(long id, string resetPassword, AntiDroneContext context);
     Task<object> GetAllMemberList(string? searchType, string? searchKeyword, AntiDroneContext context);
-    Task<object> GetSigninoutLogs(AntiDroneContext context);
-    Task<object> GetMemberChangedLogs(AntiDroneContext context);
+    Task<object> GetSigninoutLogs(string? searchType, string? searchKeyword, AntiDroneContext context);
+    Task<object> GetMemberChangedLogs(string? searchType, string? searchKeyword, AntiDroneContext context);
     Task<object> GetPendingApprovalList(string? searchType, string? searchKeyword, AntiDroneContext context);
 }
