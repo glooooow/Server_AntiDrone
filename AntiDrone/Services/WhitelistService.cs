@@ -22,6 +22,9 @@ public class WhitelistService : IWhitelistService
         {
             return ResponseGlobal<Whitelist>.Fail(ErrorCode.NotWriteValue);
         }
+        DateTime now = DateTime.Today;
+        DateOnly today = DateOnly.FromDateTime(now);
+        whitelist.now_date = today;
         context.Whitelist.Add(whitelist);
         await context.SaveChangesAsync();
         
