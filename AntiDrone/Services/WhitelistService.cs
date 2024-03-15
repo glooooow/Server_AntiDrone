@@ -35,7 +35,7 @@ public class WhitelistService : IWhitelistService
     {
         if (context.Whitelist == null)
         {
-            return ResponseGlobal<List<Whitelist>>.Fail(ErrorCode.NotWriteValue);
+            return ResponseGlobal<List<Whitelist>>.Fail(ErrorCode.NoData);
         }
         return ResponseGlobal<List<Whitelist>>.Success(await context.Whitelist.ToListAsync());
     }

@@ -17,6 +17,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IWhitelistService, WhitelistService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IMemberService, MemberService>();
+builder.Services.AddScoped<IPlaybackService, PlaybackService>();
 builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
 builder.Services.AddDistributedMemoryCache();
